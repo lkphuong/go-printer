@@ -1,10 +1,14 @@
 package app
 
 import (
+	"encoding/json"
 	"go-printer/internal/handlers"
 	"go-printer/internal/routers"
 	"go-printer/internal/services"
+	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -53,6 +57,25 @@ func (a *App) setupRouter() {
 }
 
 func NewApp() *App {
+
+	//init folder database, uploads
+	log.Println("Initializing folders...")
+	uploadsDir := filepath.Join(".", "uploads")
+	os.MkdirAll(uploadsDir, 0755)
+
+	databaseDir := filepath.Join(".", "database")
+	os.MkdirAll(databaseDir, 0755)
+
+	//init config.json
+
+	configsFile := filepath.Join(databaseDir, "config.json")
+
+	if _, err := os.Stat(configsFile); os.IsNotExist(err) {
+		emptyConfigs := []interface{}{}
+		data, _ := json.MarshalIndent(emptyConfigs, "", "  ")
+		ioutil.WriteFile(configsFile, data, 0644)
+	}
+	log.Println("Folders initialized.")
 
 	app := &App{
 		router: gin.Default(),

@@ -18,7 +18,8 @@ func GetPrinters() ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		lines := strings.Split(strings.TrimSpace(out.String()), "\n")
+		line := strings.ReplaceAll(out.String(), "\r", "")
+		lines := strings.Split(strings.TrimSpace(line), "\n")
 		return lines, nil
 
 	default:
