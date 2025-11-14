@@ -27,7 +27,7 @@ func (ps *PrintService) GetPrintersLocal() ([]string, error) {
 
 func (ps *PrintService) GetPrintConfig(printer string) (response.PrintConfigResponse, error) {
 	// Đọc file json
-	data, err := os.ReadFile("./database/config.json")
+	data, err := os.ReadFile("./config/config.json")
 	if err != nil {
 		return response.PrintConfigResponse{}, err
 	}
@@ -55,7 +55,7 @@ func (ps *PrintService) GetPrintConfig(printer string) (response.PrintConfigResp
 func (ps *PrintService) ConfigPrinter(printerName string, types []string) error {
 
 	// Đọc file json
-	data, err := os.ReadFile("./database/config.json")
+	data, err := os.ReadFile("./config/config.json")
 	if err != nil {
 		log.Println("Error reading config file:", err)
 		return err
@@ -99,7 +99,7 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 		return err
 	}
 
-	if err := os.WriteFile("./database/config.json", newData, 0644); err != nil {
+	if err := os.WriteFile("./config/config.json", newData, 0644); err != nil {
 		log.Println("Error writing config file:", err)
 		return err
 	}
@@ -110,7 +110,7 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 func (ps *PrintService) JobPrint(c *gin.Context, printType string, file *multipart.FileHeader) error {
 
 	// lấy print từ file json
-	data, err := os.ReadFile("./database/config.json")
+	data, err := os.ReadFile("./config/config.json")
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, file *multipa
 
 func (ps *PrintService) ClearCache() error {
 	// xoá hết file json dữ liệu trong file json
-	if err := os.WriteFile("./database/config.json", []byte("[]"), 0644); err != nil {
+	if err := os.WriteFile("./config/config.json", []byte("[]"), 0644); err != nil {
 		return err
 	}
 	return nil

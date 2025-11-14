@@ -5,7 +5,6 @@ import (
 	"go-printer/internal/handlers"
 	"go-printer/internal/routers"
 	"go-printer/internal/services"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,8 +16,7 @@ import (
 type App struct {
 	services *Services
 	handlers *Handlers
-	// mongoDB  *database.MongoDB
-	router *gin.Engine
+	router   *gin.Engine
 }
 
 type Services struct {
@@ -63,17 +61,17 @@ func NewApp() *App {
 	uploadsDir := filepath.Join(".", "uploads")
 	os.MkdirAll(uploadsDir, 0755)
 
-	databaseDir := filepath.Join(".", "database")
-	os.MkdirAll(databaseDir, 0755)
+	configDir := filepath.Join(".", "config")
+	os.MkdirAll(configDir, 0755)
 
 	//init config.json
 
-	configsFile := filepath.Join(databaseDir, "config.json")
+	configsFile := filepath.Join(configDir, "config.json")
 
 	if _, err := os.Stat(configsFile); os.IsNotExist(err) {
 		emptyConfigs := []interface{}{}
 		data, _ := json.MarshalIndent(emptyConfigs, "", "  ")
-		ioutil.WriteFile(configsFile, data, 0644)
+		os.WriteFile(configsFile, data, 0644)
 	}
 	log.Println("Folders initialized.")
 

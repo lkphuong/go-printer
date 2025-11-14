@@ -48,8 +48,11 @@ func PrintFile(printer, filePath string) error {
 	switch runtime.GOOS {
 	case "windows":
 		// Use mspaint with /pt option to print
-		psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
+		//print.bat "HP Laser 107a" "C:\files\bill.pdf"
+		//psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
+		psCmd := fmt.Sprintf("cmd /c configs\\print.bat %q %q", printer, filePath)
 		cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
+
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		cmd.Stderr = &out
