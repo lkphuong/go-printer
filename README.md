@@ -57,6 +57,13 @@ make build-windows
 make build-mac
 ```
 
+## Downloads
+
+Download the pre-built binaries from the [build](./build/) folder:
+
+- [macOS ARM64](./build/printer-arm64)
+- [Window AMD64](./build/printer-amd64.exe)
+
 ## API Endpoints
 
 All endpoints are prefixed with `/api/v1`.
