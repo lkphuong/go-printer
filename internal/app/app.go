@@ -54,8 +54,7 @@ func (a *App) setupRouter() {
 	}
 }
 
-func NewApp() *App {
-
+func initializing() {
 	//init folder database, uploads
 	log.Println("Initializing folders...")
 	uploadsDir := filepath.Join(".", "uploads")
@@ -65,7 +64,6 @@ func NewApp() *App {
 	os.MkdirAll(configDir, 0755)
 
 	//init config.json
-
 	configsFile := filepath.Join(configDir, "config.json")
 
 	if _, err := os.Stat(configsFile); os.IsNotExist(err) {
@@ -73,7 +71,24 @@ func NewApp() *App {
 		data, _ := json.MarshalIndent(emptyConfigs, "", "  ")
 		os.WriteFile(configsFile, data, 0644)
 	}
+
+	//init device.json
+	deviceFile := filepath.Join(configDir, "device.json")
+
+	if _, err := os.Stat(deviceFile); os.IsNotExist(err) {
+		defaultDeviceConfig := map[string]string{
+			"location": "office",
+		}
+		data, _ := json.MarshalIndent(defaultDeviceConfig, "", "  ")
+		os.WriteFile(deviceFile, data, 0644)
+	}
+
 	log.Println("Folders initialized.")
+}
+
+func NewApp() *App {
+
+	initializing()
 
 	app := &App{
 		router: gin.Default(),

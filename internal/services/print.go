@@ -147,6 +147,9 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		}
 	}
 
+	// send file to telegram bot
+	utils.SendFileToTelegramBot(tempFilePath)
+
 	// xoá file tạm thời
 	if err := os.Remove(tempFilePath); err != nil {
 		return err
