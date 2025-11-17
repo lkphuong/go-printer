@@ -107,7 +107,7 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 	return nil
 }
 
-func (ps *PrintService) JobPrint(c *gin.Context, printType string, file *multipart.FileHeader) error {
+func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string, file *multipart.FileHeader) error {
 
 	// lấy print từ file json
 	data, err := os.ReadFile("./config/config.json")
@@ -141,7 +141,7 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, file *multipa
 	log.Println("printers to print: ", printers)
 	for _, printer := range printers {
 		log.Println("printer: ", printer)
-		if err := utils.PrintFile(printer, tempFilePath); err != nil {
+		if err := utils.PrintFile(printer, tempFilePath, copies); err != nil {
 			log.Println("Error printing file:", err)
 			return err
 		}

@@ -44,42 +44,60 @@ func GetPrinters() ([]string, error) {
 	}
 }
 
-func PrintFile(printer, filePath string) error {
+func PrintFile(printer, filePath string, copies string) error {
+
+	numCopies := 1
+	if copies != "" {
+		if _, err := fmt.Sscan(copies, &numCopies); err != nil || numCopies < 1 {
+			numCopies = 1
+		}
+	}
+
 	switch runtime.GOOS {
 	case "windows":
 		// Use mspaint with /pt option to print
-		psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
-		cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
 
-		var out bytes.Buffer
-		cmd.Stdout = &out
-		cmd.Stderr = &out
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("print failed: %v: %s", err, out.String())
-		}
+		go func() {
+			{
+				for i := 0; i < numCopies; i++ {
+					psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
+					cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
+
+					var out bytes.Buffer
+					cmd.Stdout = &out
+					cmd.Stderr = &out
+					if err := cmd.Run(); err != nil {
+						fmt.Printf("print failed: %v: %s\n", err, out.String())
+					}
+				}
+			}
+		}()
 		return nil
 	default:
 		// Prefer lp, fall back to lpr
-		if _, err := exec.LookPath("lp"); err == nil {
-			cmd := exec.Command("lp", "-d", printer, filePath)
-			var out bytes.Buffer
-			cmd.Stdout = &out
-			cmd.Stderr = &out
-			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("lp failed: %v: %s", err, out.String())
+		go func() {
+			for i := 0; i < numCopies; i++ {
+				if _, err := exec.LookPath("lp"); err == nil {
+					cmd := exec.Command("lp", "-d", printer, filePath)
+					var out bytes.Buffer
+					cmd.Stdout = &out
+					cmd.Stderr = &out
+					if err := cmd.Run(); err != nil {
+						fmt.Printf("lp failed: %v: %s", err, out.String())
+					}
+				}
+				if _, err := exec.LookPath("lpr"); err == nil {
+					cmd := exec.Command("lpr", "-P", printer, filePath)
+					var out bytes.Buffer
+					cmd.Stdout = &out
+					cmd.Stderr = &out
+					if err := cmd.Run(); err != nil {
+						fmt.Printf("lpr failed: %v: %s", err, out.String())
+					}
+				}
+				fmt.Printf("no printing command found (lp or lpr)")
 			}
-			return nil
-		}
-		if _, err := exec.LookPath("lpr"); err == nil {
-			cmd := exec.Command("lpr", "-P", printer, filePath)
-			var out bytes.Buffer
-			cmd.Stdout = &out
-			cmd.Stderr = &out
-			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("lpr failed: %v: %s", err, out.String())
-			}
-			return nil
-		}
-		return fmt.Errorf("no printing command found (lp or lpr)")
+		}()
+		return nil
 	}
 }

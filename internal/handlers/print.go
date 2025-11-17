@@ -74,13 +74,17 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 
 	files := form.File["file"]
 	printType := form.Value["type"]
+	copies := form.Value["copies"]
+	if len(copies) > 0 {
+		log.Printf("Copies: %s\n", copies[0])
+	}
 
 	if len(files) == 0 {
 		utils.ResponseError(c, http.StatusBadRequest, "No files uploaded", nil)
 		return
 	}
 
-	if err := ph.printService.JobPrint(c, printType[0], files[0]); err != nil {
+	if err := ph.printService.JobPrint(c, printType[0], copies[0], files[0]); err != nil {
 		utils.ResponseError(c, http.StatusBadRequest, "Failed to print job", err.Error())
 		return
 	}
