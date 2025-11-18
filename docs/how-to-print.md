@@ -1,4 +1,4 @@
-## In Ấn Trên macOS/Linux
+## In Trên macOS/Linux
 
 Trên macOS và Linux, hệ thống in thường dựa trên CUPS (Common Unix Printing System). Bạn có thể sử dụng lệnh `lpstat` để kiểm tra trạng thái máy in và các công việc in đang chờ.
 
@@ -41,7 +41,7 @@ Lệnh này liệt kê các công việc in đang chờ hoặc đang xử lý.
 - Đảm bảo máy in đã được cài đặt và kết nối đúng cách qua System Preferences (macOS) hoặc CUPS web interface (Linux).
 - Nếu gặp vấn đề, kiểm tra log của CUPS hoặc khởi động lại dịch vụ in.
 
-## In Ấn Trên Windows
+## In Trên Windows
 
 Trên Windows, việc in thường yêu cầu qua một ứng dụng trung gian vì hệ thống không hỗ trợ gửi trực tiếp file đến máy in từ dòng lệnh như trên Unix-based systems.
 
