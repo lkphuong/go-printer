@@ -2,14 +2,35 @@ package utils
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"go-printer/internal/constants"
+	"io"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 )
+
+var sumatraPDF embed.FS
+var sumatraPath string
+
+func init() {
+	log.Println("Initializing utils package")
+	if runtime.GOOS == "windows" {
+		tempDir := os.TempDir()
+		sumatraPath = filepath.Join(tempDir, "SumatraPDF.exe")
+		if _, err := os.Stat(sumatraPath); os.IsNotExist(err) {
+			// Chỉ extract nếu chưa tồn tại
+			if err := extractEmbeddedFile("tools/SumatraPDF.exe", sumatraPath); err != nil {
+				log.Printf("Failed to extract SumatraPDF: %v", err)
+			}
+		}
+	}
+}
 
 func GetPrinters() ([]string, error) {
 	switch runtime.GOOS {
@@ -58,12 +79,20 @@ func PrintFile(printer, filePath string, copies string) error {
 
 	switch runtime.GOOS {
 	case "windows":
-		// Use mspaint with /pt option to print
-
 		for i := 0; i < numCopies; i++ {
-			psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
-			cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
+			/*
+				psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
+				cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
 
+				var out bytes.Buffer
+				cmd.Stdout = &out
+				cmd.Stderr = &out
+				if err := cmd.Run(); err != nil {
+					fmt.Printf("print failed: %v: %s\n", err, out.String())
+				}
+			*/
+			// use SumatraPDF for better performance
+			cmd := exec.Command(sumatraPath, "-print-to", printer, "-silent", filePath)
 			var out bytes.Buffer
 			cmd.Stdout = &out
 			cmd.Stderr = &out
@@ -98,6 +127,25 @@ func PrintFile(printer, filePath string, copies string) error {
 		}
 		return nil
 	}
+}
+
+func HealthCheckQueue(printer string) error {
+	// interval 3 minutes, step 5s or queue empty return success
+	for i := 0; i < 36; i++ {
+		status, error := queuePrinter(printer)
+		if status {
+			break
+		}
+
+		if !status {
+			if error != nil {
+				return error
+			}
+			log.Printf("Health check printer %s passed\n", printer)
+			time.Sleep(5 * time.Second)
+		}
+	}
+	return nil
 }
 
 func queuePrinter(printer string) (bool, error) {
@@ -152,21 +200,19 @@ func queuePrinter(printer string) (bool, error) {
 	return false, nil
 }
 
-func HealthCheckQueue(printer string) error {
-	// interval 3 minutes, step 5s or queue empty return success
-	for i := 0; i < 36; i++ {
-		status, error := queuePrinter(printer)
-		if status {
-			break
-		}
-
-		if !status {
-			if error != nil {
-				return error
-			}
-			log.Printf("Health check printer %s passed\n", printer)
-			time.Sleep(5 * time.Second)
-		}
+func extractEmbeddedFile(embedPath, destPath string) error {
+	data, err := sumatraPDF.ReadFile(embedPath)
+	if err != nil {
+		return err
 	}
-	return nil
+	file, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = io.Copy(file, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	return os.Chmod(destPath, 0755) // accept executable
 }
