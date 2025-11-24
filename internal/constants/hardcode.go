@@ -9,5 +9,6 @@ const (
 type PrintType string
 
 const (
-	PRINT_FAILED = "print_failed"
+	PRINT_FAILED    = "print_failed"
+	PRINT_NOT_FOUND = "print_not_found"
 )

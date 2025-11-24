@@ -85,7 +85,7 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	}
 
 	if err := ph.printService.JobPrint(c, printType[0], copies[0], files[0]); err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to print job", err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, err.Error(), err.Error())
 		return
 	}
 

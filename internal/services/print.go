@@ -2,6 +2,8 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
+	"go-printer/internal/constants"
 	"go-printer/internal/dto/response"
 	"go-printer/internal/utils"
 	"log"
@@ -128,6 +130,10 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 				printers = append(printers, c.PrinterName)
 			}
 		}
+	}
+
+	if len(printers) == 0 {
+		return fmt.Errorf(constants.PRINT_NOT_FOUND)
 	}
 
 	// save file tạm thời
