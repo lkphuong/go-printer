@@ -3,9 +3,11 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func GetPrinters() ([]string, error) {
@@ -95,4 +97,75 @@ func PrintFile(printer, filePath string, copies string) error {
 		}
 		return nil
 	}
+}
+
+func queuePrinter(printer string) (bool, error) {
+	// only windown
+	psCmd := fmt.Sprintf("wmic printjob where \"name like '%%%s%%'\" list brief", printer)
+	cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("print failed: %v: %s\n", err, out.String())
+	}
+
+	jobStatus := out.String()
+
+	// check queue empty
+	if strings.TrimSpace(jobStatus) == "" {
+		log.Printf("Print queue for printer %s is empty\n", printer)
+		return true, nil
+	}
+
+	// check job status
+	for _, line := range strings.Split(jobStatus, "\n") {
+		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "JobId") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) < 3 {
+			continue
+		}
+		jobID := fields[0]
+		status := fields[2]
+		log.Printf("Job ID: %s, Status: %s\n", jobID, status)
+
+		if strings.ToLower(status) == "error" {
+
+			// clean all job
+			psCleanCmd := fmt.Sprintf("wmic printjob where \"name like '%%%s%%'\" delete", printer)
+			cleanCmd := exec.Command("powershell", "-NoProfile", "-Command", psCleanCmd)
+			var cleanOut bytes.Buffer
+			cleanCmd.Stdout = &cleanOut
+			cleanCmd.Stderr = &cleanOut
+			if err := cleanCmd.Run(); err != nil {
+				fmt.Printf("clean print job failed: %v: %s\n", err, cleanOut.String())
+			} else {
+				log.Printf("Cleaned all print jobs for printer %s\n", printer)
+			}
+
+			return false, fmt.Errorf("print job %s has error status", jobID)
+		}
+	}
+	return false, nil
+}
+
+func HealthCheckQueue(printer string) error {
+	// interval 3 minutes, step 5s or queue empty return success
+	for i := 0; i < 36; i++ {
+		status, error := queuePrinter(printer)
+		if status {
+			break
+		}
+
+		if !status {
+			if error != nil {
+				return error
+			}
+			log.Printf("Health check printer %s passed\n", printer)
+			time.Sleep(5 * time.Second)
+		}
+	}
+	return nil
 }

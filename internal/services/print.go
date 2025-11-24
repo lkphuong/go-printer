@@ -155,6 +155,14 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		return err
 	}
 
+	// health check queue
+	for _, printer := range printers {
+		if err := utils.HealthCheckQueue(printer); err != nil {
+			log.Println("Error in health check queue:", err)
+			return err
+		}
+	}
+
 	return nil
 }
 
