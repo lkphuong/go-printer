@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+//go:embed tools/SumatraPDF.exe
 var sumatraPDF embed.FS
 var sumatraPath string
 
