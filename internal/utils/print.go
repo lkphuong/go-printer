@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"go-printer/internal/constants"
 	"log"
 	"os/exec"
 	"runtime"
@@ -145,7 +146,7 @@ func queuePrinter(printer string) (bool, error) {
 				log.Printf("Cleaned all print jobs for printer %s\n", printer)
 			}
 
-			return false, fmt.Errorf("print job %s has error status", jobID)
+			return false, fmt.Errorf(constants.PRINT_FAILED)
 		}
 	}
 	return false, nil

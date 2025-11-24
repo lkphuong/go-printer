@@ -7,3 +7,7 @@ const (
 )
 
 type PrintType string
+
+const (
+	PRINT_FAILED = "print_failed"
+)
