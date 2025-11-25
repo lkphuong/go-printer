@@ -157,9 +157,9 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	utils.SendFileToTelegramBot(tempFilePath)
 
 	// xoá file tạm thời
-	if err := os.Remove(tempFilePath); err != nil {
-		return err
-	}
+	// if err := os.Remove(tempFilePath); err != nil {
+	// 	return err
+	// }
 
 	// health check queue
 	for _, printer := range printers {
