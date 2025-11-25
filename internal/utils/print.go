@@ -100,7 +100,7 @@ func PrintFile(printer, filePath string, copies string) error {
 		} else {
 			log.Printf("Using SumatraPDF at: %s", sumatraPath)
 			for i := 0; i < numCopies; i++ {
-				// use SumatraPDF for better performance
+				// use SumatraPDF for better performance layout portrait
 				cmd := exec.Command(sumatraPath, "-print-to", printer, "-silent", filePath)
 				var out bytes.Buffer
 				cmd.Stdout = &out
