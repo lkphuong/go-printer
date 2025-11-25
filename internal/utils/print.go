@@ -23,12 +23,24 @@ func init() {
 	log.Println("Initializing utils package")
 	if runtime.GOOS == "windows" {
 		tempDir := os.TempDir()
-		sumatraPath = filepath.Join(tempDir, "SumatraPDF.exe")
-		if _, err := os.Stat(sumatraPath); os.IsNotExist(err) {
+		tempPath := filepath.Join(tempDir, "SumatraPDF.exe")
+		log.Printf("Temp dir: %s, Temp path: %s", tempDir, tempPath)
+		if _, err := os.Stat(tempPath); os.IsNotExist(err) {
 			// Chỉ extract nếu chưa tồn tại
-			if err := extractEmbeddedFile("tools/SumatraPDF.exe", sumatraPath); err != nil {
+			log.Println("Extracting SumatraPDF...")
+			if err := extractEmbeddedFile("tools/SumatraPDF.exe", tempPath); err != nil {
 				log.Printf("Failed to extract SumatraPDF: %v", err)
+				return // Không gán sumatraPath nếu extract thất bại
 			}
+			log.Println("Extracted SumatraPDF successfully")
+		} else {
+			log.Println("SumatraPDF already exists in temp")
+		}
+		if _, err := os.Stat(tempPath); err == nil {
+			sumatraPath = tempPath
+			log.Printf("SumatraPath set to: %s", sumatraPath)
+		} else {
+			log.Printf("SumatraPDF file not found after extraction: %v", err)
 		}
 	}
 }
@@ -80,25 +92,30 @@ func PrintFile(printer, filePath string, copies string) error {
 
 	switch runtime.GOOS {
 	case "windows":
-		for i := 0; i < numCopies; i++ {
-			/*
+		if sumatraPath == "" {
+			// Fallback to mspaint if SumatraPDF not available
+			log.Println("Using mspaint fallback")
+			for i := 0; i < numCopies; i++ {
 				psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
 				cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
-
 				var out bytes.Buffer
 				cmd.Stdout = &out
 				cmd.Stderr = &out
 				if err := cmd.Run(); err != nil {
 					fmt.Printf("print failed: %v: %s\n", err, out.String())
 				}
-			*/
-			// use SumatraPDF for better performance
-			cmd := exec.Command(sumatraPath, "-print-to", printer, "-silent", filePath)
-			var out bytes.Buffer
-			cmd.Stdout = &out
-			cmd.Stderr = &out
-			if err := cmd.Run(); err != nil {
-				fmt.Printf("print failed: %v: %s\n", err, out.String())
+			}
+		} else {
+			log.Printf("Using SumatraPDF at: %s", sumatraPath)
+			for i := 0; i < numCopies; i++ {
+				// use SumatraPDF for better performance
+				cmd := exec.Command(sumatraPath, "-print-to", printer, "-silent", filePath)
+				var out bytes.Buffer
+				cmd.Stdout = &out
+				cmd.Stderr = &out
+				if err := cmd.Run(); err != nil {
+					fmt.Printf("print failed: %v: %s\n", err, out.String())
+				}
 			}
 		}
 
@@ -180,6 +197,11 @@ func queuePrinter(printer string) (bool, error) {
 		jobID := fields[0]
 		status := fields[2]
 		log.Printf("Job ID: %s, Status: %s\n", jobID, status)
+
+		// check status Available -> success
+		if strings.ToLower(status) == "available" {
+			return true, nil
+		}
 
 		if strings.ToLower(status) == "error" {
 
