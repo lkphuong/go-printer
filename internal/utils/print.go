@@ -237,5 +237,9 @@ func extractEmbeddedFile(embedPath, destPath string) error {
 	if err != nil {
 		return err
 	}
-	return os.Chmod(destPath, 0755) // accept executable
+	// Chỉ chmod trên non-Windows
+	if runtime.GOOS != "windows" {
+		return os.Chmod(destPath, 0755)
+	}
+	return nil
 }
