@@ -75,8 +75,9 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	files := form.File["file"]
 	printType := form.Value["type"]
 	copies := form.Value["copies"]
-	if len(copies) > 0 {
-		log.Printf("Copies: %s\n", copies[0])
+	log.Println("copies: ", len(copies))
+	if len(copies) == 0 {
+		copies = []string{"1"} // default 1 copy
 	}
 
 	if len(files) == 0 {
