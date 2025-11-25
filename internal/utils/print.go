@@ -25,23 +25,15 @@ func init() {
 		tempDir := os.TempDir()
 		tempPath := filepath.Join(tempDir, "SumatraPDF.exe")
 		log.Printf("Temp dir: %s, Temp path: %s", tempDir, tempPath)
-		if _, err := os.Stat(tempPath); os.IsNotExist(err) {
-			// Chỉ extract nếu chưa tồn tại
-			log.Println("Extracting SumatraPDF...")
-			if err := extractEmbeddedFile("tools/SumatraPDF.exe", tempPath); err != nil {
-				log.Printf("Failed to extract SumatraPDF: %v", err)
-				return // Không gán sumatraPath nếu extract thất bại
-			}
-			log.Println("Extracted SumatraPDF successfully")
-		} else {
-			log.Println("SumatraPDF already exists in temp")
+		// luôn extract SumatraPDF mỗi lần khởi động để đảm bảo phiên bản mới nhất được sử dụng
+		log.Println("Extracting SumatraPDF...")
+		if err := extractEmbeddedFile("tools/SumatraPDF.exe", tempPath); err != nil {
+			log.Printf("Failed to extract SumatraPDF: %v", err)
+			return // Không gán sumatraPath nếu extract thất bại
 		}
-		if _, err := os.Stat(tempPath); err == nil {
-			sumatraPath = tempPath
-			log.Printf("SumatraPath set to: %s", sumatraPath)
-		} else {
-			log.Printf("SumatraPDF file not found after extraction: %v", err)
-		}
+		log.Println("Extracted SumatraPDF successfully")
+		sumatraPath = tempPath
+		log.Printf("SumatraPath set to: %s", sumatraPath)
 	}
 }
 
@@ -198,8 +190,8 @@ func queuePrinter(printer string) (bool, error) {
 		status := fields[2]
 		log.Printf("Job ID: %s, Status: %s\n", jobID, status)
 
-		// check status Available -> success
-		if strings.ToLower(status) == "available" {
+		// check status job id -> success
+		if strings.ToLower(jobID) == "no" {
 			return true, nil
 		}
 
