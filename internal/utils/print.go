@@ -30,7 +30,6 @@ func GetPrinters() ([]string, error) {
 			fields := strings.Fields(line)
 			printerName := fields[0]
 			portName := fields[3]
-			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
 			if !strings.HasPrefix(printerName, "---") {
 				lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
 			}
