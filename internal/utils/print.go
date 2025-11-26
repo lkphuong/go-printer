@@ -25,10 +25,10 @@ func GetPrinters() ([]string, error) {
 		}
 		// return array of printer names:portName
 		lines := []string{}
-		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n")[3:] {
+		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n")[2:] {
 			fields := strings.Fields(line)
 			printerName := fields[0]
-			portName := fields[4]
+			portName := fields[3]
 			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
 		}
 
@@ -65,7 +65,14 @@ func PrintFile(printer string, filePath string, copies string) error {
 		}
 	}
 
-	printerConn, err := net.Dial("tcp", printer)
+	// printer|192.168.1.100:9100
+	parts := strings.Split(printer, "|")
+	if len(parts) != 2 {
+		return fmt.Errorf("invalid printer format")
+	}
+	address := parts[1]
+
+	printerConn, err := net.Dial("tcp", address)
 	if err != nil {
 		log.Fatalf("Lỗi kết nối máy in: %v", err)
 	}
