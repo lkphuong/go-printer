@@ -143,31 +143,25 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		return err
 	}
 
-	// in file với từng printer
-	log.Println("printers to print: ", printers)
+	f, err := file.Open()
+	if err != nil {
+		log.Println("read file error: ", err)
+		return err
+	}
+	defer f.Close()
+
+	// gửi in cho từng printer
 	for _, printer := range printers {
-		log.Println("printer: ", printer)
 		if err := utils.PrintFile(printer, tempFilePath, copies); err != nil {
-			log.Println("Error printing file:", err)
+			log.Println("print file error: ", err)
 			return err
 		}
 	}
+
+	log.Println("print done")
 
 	// send file to telegram bot
 	utils.SendFileToTelegramBot(tempFilePath)
-
-	// xoá file tạm thời
-	// if err := os.Remove(tempFilePath); err != nil {
-	// 	return err
-	// }
-
-	// health check queue
-	for _, printer := range printers {
-		if err := utils.HealthCheckQueue(printer); err != nil {
-			log.Println("Error in health check queue:", err)
-			return err
-		}
-	}
 
 	return nil
 }

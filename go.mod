@@ -5,6 +5,12 @@ go 1.23.0
 require github.com/gin-gonic/gin v1.11.0
 
 require (
+	github.com/hennedo/escpos v0.0.1 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
+	github.com/qiniu/iconv v1.2.0 // indirect
+)
+
+require (
 	github.com/bytedance/sonic v1.14.0 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect

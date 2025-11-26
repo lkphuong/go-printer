@@ -2,54 +2,37 @@ package utils
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
-	"go-printer/internal/constants"
-	"io"
+	"image"
 	"log"
+	"net"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 )
 
-//go:embed tools/SumatraPDF.exe
-var sumatraPDF embed.FS
-var sumatraPath string
-
-func init() {
-	log.Println("Initializing utils package")
-	if runtime.GOOS == "windows" {
-		tempDir := os.TempDir()
-		tempPath := filepath.Join(tempDir, "SumatraPDF.exe")
-		log.Printf("Temp dir: %s, Temp path: %s", tempDir, tempPath)
-		// luôn extract SumatraPDF mỗi lần khởi động để đảm bảo phiên bản mới nhất được sử dụng
-		log.Println("Extracting SumatraPDF...")
-		if err := extractEmbeddedFile("tools/SumatraPDF.exe", tempPath); err != nil {
-			log.Printf("Failed to extract SumatraPDF: %v", err)
-			return // Không gán sumatraPath nếu extract thất bại
-		}
-		log.Println("Extracted SumatraPDF successfully")
-		sumatraPath = tempPath
-		log.Printf("SumatraPath set to: %s", sumatraPath)
-	}
-}
-
 func GetPrinters() ([]string, error) {
 	switch runtime.GOOS {
 	case "windows":
-		cmd := exec.Command("powershell", "Get-Printer | Select-Object -ExpandProperty Name")
+		cmd := exec.Command("powershell", "Get-Printer")
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		err := cmd.Run()
 		if err != nil {
 			return nil, err
 		}
-		line := strings.ReplaceAll(out.String(), "\r", "")
-		lines := strings.Split(strings.TrimSpace(line), "\n")
-		return lines, nil
+		// return array of printer names:portName
+		lines := []string{}
+		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n")[3:] {
+			fields := strings.Fields(line)
+			printerName := fields[0]
+			portName := fields[4]
+			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
+		}
+
+		return lines, nil // iTP86|192.168.1.100:9100
 
 	default:
 		cmd := exec.Command("lpstat", "-p")
@@ -73,7 +56,7 @@ func GetPrinters() ([]string, error) {
 	}
 }
 
-func PrintFile(printer, filePath string, copies string) error {
+func PrintFile(printer string, filePath string, copies string) error {
 
 	numCopies := 1
 	if copies != "" {
@@ -82,156 +65,172 @@ func PrintFile(printer, filePath string, copies string) error {
 		}
 	}
 
-	switch runtime.GOOS {
-	case "windows":
-		if sumatraPath == "" {
-			// Fallback to mspaint if SumatraPDF not available
-			log.Println("Using mspaint fallback")
-			for i := 0; i < numCopies; i++ {
-				psCmd := fmt.Sprintf("mspaint /pt %q %q", filePath, printer)
-				cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
-				var out bytes.Buffer
-				cmd.Stdout = &out
-				cmd.Stderr = &out
-				if err := cmd.Run(); err != nil {
-					fmt.Printf("print failed: %v: %s\n", err, out.String())
-				}
-			}
-		} else {
-			log.Printf("Using SumatraPDF at: %s", sumatraPath)
-			for i := 0; i < numCopies; i++ {
-				// use SumatraPDF for better performance layout portrait
-				cmd := exec.Command(sumatraPath, "-print-to", printer, "-silent", filePath)
-				var out bytes.Buffer
-				cmd.Stdout = &out
-				cmd.Stderr = &out
-				if err := cmd.Run(); err != nil {
-					fmt.Printf("print failed: %v: %s\n", err, out.String())
-				}
-			}
-		}
-
-		return nil
-	default:
-		// Prefer lp, fall back to lpr
-		for i := 0; i < numCopies; i++ {
-			if _, err := exec.LookPath("lp"); err == nil {
-				cmd := exec.Command("lp", "-d", printer, filePath)
-				var out bytes.Buffer
-				cmd.Stdout = &out
-				cmd.Stderr = &out
-				if err := cmd.Run(); err != nil {
-					fmt.Printf("lp failed: %v: %s", err, out.String())
-				}
-			}
-			if _, err := exec.LookPath("lpr"); err == nil {
-				cmd := exec.Command("lpr", "-P", printer, filePath)
-				var out bytes.Buffer
-				cmd.Stdout = &out
-				cmd.Stderr = &out
-				if err := cmd.Run(); err != nil {
-					fmt.Printf("lpr failed: %v: %s", err, out.String())
-				}
-			}
-			fmt.Printf("no printing command found (lp or lpr)")
-		}
-		return nil
+	printerConn, err := net.Dial("tcp", printer)
+	if err != nil {
+		log.Fatalf("Lỗi kết nối máy in: %v", err)
 	}
-}
+	defer printerConn.Close()
 
-func HealthCheckQueue(printer string) error {
-	// interval 3 minutes, step 5s or queue empty return success
-	for i := 0; i < 36; i++ {
-		status, error := queuePrinter(printer)
-		if status {
-			break
-		}
+	const MaxPrinterDots = 576 // Số điểm tối đa của máy in (tùy thuộc vào máy in)
 
-		if !status {
-			if error != nil {
-				return error
-			}
-			log.Printf("Health check printer %s passed\n", printer)
-			time.Sleep(5 * time.Second)
+	// Kiểm tra status máy in
+	err = printStatus(printerConn)
+	if err != nil {
+		log.Println("Lỗi trạng thái máy in: ", err)
+		return err
+	}
+
+	// Mở file ảnh
+	imgFile, err := os.Open(filePath)
+	if err != nil {
+		log.Println("Mở file ảnh fail: ", err)
+		return err
+	}
+	defer imgFile.Close()
+
+	// Giải mã ảnh
+	img, _, err := image.Decode(imgFile)
+	if err != nil {
+		log.Println("Giải mã ảnh fail: ", err)
+		return err
+	}
+
+	// Tạo lệnh in ảnh
+	printCmd, err := printImageCommand(img, MaxPrinterDots)
+	if err != nil {
+		log.Println("Tạo lệnh in ảnh fail: ", err)
+		return err
+	}
+
+	// Gửi lệnh in nhiều bản
+	for i := 0; i < numCopies; i++ {
+		_, err = printerConn.Write(printCmd)
+
+		// Thêm vài dòng trắng dòng trắng sau khi in ảnh
+		printerConn.Write([]byte{0x0A, 0x0A, 0x0A, 0x0A})
+		// conn.Write([]byte{0x0A, 0x0A})
+		printerConn.Write([]byte{0x1D, 0x56, 0x00}) // Cắt giấy (GS V 0)
+
+		if err != nil {
+			log.Println("Gửi lệnh in fail: ", err)
+			return err
 		}
 	}
+
 	return nil
 }
 
-func queuePrinter(printer string) (bool, error) {
-	// only windown
-	psCmd := fmt.Sprintf("wmic printjob where \"name like '%%%s%%'\" list brief", printer)
-	cmd := exec.Command("powershell", "-NoProfile", "-Command", psCmd)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &out
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("print failed: %v: %s\n", err, out.String())
-	}
-
-	jobStatus := out.String()
-
-	// check queue empty
-	if strings.TrimSpace(jobStatus) == "" {
-		log.Printf("Print queue for printer %s is empty\n", printer)
-		return true, nil
-	}
-
-	// check job status
-	for _, line := range strings.Split(jobStatus, "\n") {
-		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "JobId") {
-			continue
-		}
-		fields := strings.Fields(line)
-		if len(fields) < 3 {
-			continue
-		}
-		jobID := fields[0]
-		status := fields[2]
-		log.Printf("Job ID: %s, Status: %s\n", jobID, status)
-
-		// check status job id -> success
-		if strings.ToLower(jobID) == "no" {
-			return true, nil
-		}
-
-		if strings.ToLower(status) == "error" {
-
-			// clean all job
-			psCleanCmd := fmt.Sprintf("wmic printjob where \"name like '%%%s%%'\" delete", printer)
-			cleanCmd := exec.Command("powershell", "-NoProfile", "-Command", psCleanCmd)
-			var cleanOut bytes.Buffer
-			cleanCmd.Stdout = &cleanOut
-			cleanCmd.Stderr = &cleanOut
-			if err := cleanCmd.Run(); err != nil {
-				fmt.Printf("clean print job failed: %v: %s\n", err, cleanOut.String())
-			} else {
-				log.Printf("Cleaned all print jobs for printer %s\n", printer)
-			}
-
-			return false, fmt.Errorf(constants.PRINT_FAILED)
+func resizeImage(img image.Image, newWidth int, newHeight int) image.Image {
+	bounds := img.Bounds()                                         // lấy kích thước ban đầu của ảnh
+	oldWidth := bounds.Dx()                                        // chiều rộng ban đầu
+	oldHeight := bounds.Dy()                                       // chiều cao ban đầu
+	newImg := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight)) // tạo ảnh mới với kích thước mới
+	// thực hiện resize ảnh
+	for y := 0; y < newHeight; y++ { // duyệt qua từng pixel theo chiều cao
+		for x := 0; x < newWidth; x++ { // duyệt qua từng pixel theo chiều rộng
+			oldX := x * oldWidth / newWidth      // tính toán vị trí pixel tương ứng trong ảnh gốc
+			oldY := y * oldHeight / newHeight    // tính toán vị trí pixel tương ứng trong ảnh gốc
+			newImg.Set(x, y, img.At(oldX, oldY)) // gán giá trị pixel từ ảnh gốc sang ảnh mới
 		}
 	}
-	return false, nil
+	return newImg // trả về ảnh đã được resize
 }
 
-func extractEmbeddedFile(embedPath, destPath string) error {
-	data, err := sumatraPDF.ReadFile(embedPath)
+func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
+	bounds := img.Bounds() // Lấy kích thước ảnh
+	w := bounds.Dx()       // Chiều rộng ảnh
+	h := bounds.Dy()       // Chiều cao ảnh
+
+	if w > maxWidth {
+		ratio := float64(maxWidth) / float64(w) // Tính tỉ lệ resize
+		newH := int(float64(h) * ratio)         // Tính chiều cao mới theo tỉ lệ
+		img = resizeImage(img, maxWidth, newH)  // Resize ảnh
+		w = maxWidth                            // Cập nhật lại chiều rộng
+		h = newH                                // Cập nhật lại chiều cao
+	}
+
+	byteWidth := (w + 7) / 8 // Chiều rộng tính theo byte (mỗi byte chứa 8 pixel)
+
+	xL := byte(byteWidth & 0xFF) // LSB của chiều rộng
+	xH := byte(byteWidth >> 8)   // MSB của chiều rộng
+	yL := byte(h & 0xFF)         // LSB của chiều cao
+	yH := byte(h >> 8)           // MSB của chiều cao
+
+	command := []byte{0x1D, 0x76, 0x30, 0x00} // Khởi đầu lệnh in ảnh
+
+	command = append(command, xL, xH, yL, yH) // Thêm thông tin chiều rộng và chiều cao
+
+	// Chuyển đổi ảnh sang định dạng đen trắng 1 bit
+	data := make([]byte, byteWidth*h) // Dữ liệu ảnh in
+	for y := 0; y < h; y++ {          // Duyệt qua từng hàng
+		for x := 0; x < w; x++ { // Duyệt qua từng cột
+			r, g, b, _ := img.At(x, y).RGBA() // Lấy giá trị màu của pixel
+			// Chuyển đổi sang thang độ xám
+			grayValue := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+
+			if grayValue < 32768 { // Ngưỡng để xác định đen trắng
+				byteIndex := y*byteWidth + x/8        // Vị trí byte trong dữ liệu
+				bitPosition := 7 - (x % 8)            // Vị trí bit trong byte
+				data[byteIndex] |= (1 << bitPosition) // Đặt bit thành 1 (đen)
+			}
+		}
+	}
+
+	command = append(command, data...) // Thêm dữ liệu ảnh vào lệnh in
+
+	return command, nil
+}
+
+func printStatus(printerConn net.Conn) error {
+	// Gửi lệnh truy vấn trạng thái: GS r 1 (0x1D 0x72 0x01)
+	statusCmd := []byte{0x1D, 0x72, 0x01}
+	_, err := printerConn.Write(statusCmd)
 	if err != nil {
 		return err
 	}
-	file, err := os.Create(destPath)
-	if err != nil {
+
+	// Đọc phản hồi trạng thái từ máy in
+	buffer := make([]byte, 1)
+	printerConn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	n, err := printerConn.Read(buffer)
+	if err != nil || n != 1 {
 		return err
 	}
-	defer file.Close()
-	_, err = io.Copy(file, bytes.NewReader(data))
-	if err != nil {
-		return err
+
+	status := buffer[0]
+	log.Printf("Trạng thái máy in: 0x%02X", status)
+
+	// Log các lỗi dựa trên bit
+	errors := []string{}
+	if status&0x01 != 0 {
+		errors = append(errors, "Offline")
 	}
-	// Chỉ chmod trên non-Windows
-	if runtime.GOOS != "windows" {
-		return os.Chmod(destPath, 0755)
+	if status&0x02 != 0 {
+		errors = append(errors, "Nắp mở")
 	}
+	if status&0x04 != 0 {
+		errors = append(errors, "Nút cấp giấy được nhấn")
+	}
+	if status&0x08 != 0 {
+		errors = append(errors, "Hết giấy")
+	}
+	if status&0x10 != 0 {
+		errors = append(errors, "Lỗi")
+	}
+	if status&0x20 != 0 {
+		errors = append(errors, "Giấy gần hết")
+	}
+	if status&0x40 != 0 {
+		errors = append(errors, "Lỗi cắt giấy")
+	}
+	if status&0x80 != 0 {
+		errors = append(errors, "Lỗi không khắc phục")
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("lỗi máy in: %v", errors)
+	}
+
 	return nil
+
 }
