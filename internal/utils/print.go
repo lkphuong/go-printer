@@ -15,6 +15,40 @@ import (
 	"time"
 )
 
+type PrintRequest struct {
+	Printer  string
+	FilePath string
+	Copies   string
+	Result   chan error
+}
+
+var printQueue = make(chan PrintRequest, 100)
+
+func startPrintWorker() {
+	log.Println("Init worker")
+	go func() {
+		for req := range printQueue {
+			err := printFile(req.Printer, req.FilePath, req.Copies)
+			req.Result <- err
+		}
+	}()
+}
+
+func init() {
+	startPrintWorker()
+}
+
+func PrintFileQueued(printer string, filePath string, copies string) error {
+	req := PrintRequest{
+		Printer:  printer,
+		FilePath: filePath,
+		Copies:   copies,
+		Result:   make(chan error, 1),
+	}
+	printQueue <- req
+	return <-req.Result
+}
+
 func GetPrinters() ([]string, error) {
 	switch runtime.GOOS {
 	case "windows":
@@ -61,7 +95,7 @@ func GetPrinters() ([]string, error) {
 	}
 }
 
-func PrintFile(printer string, filePath string, copies string) error {
+func printFile(printer string, filePath string, copies string) error {
 
 	numCopies := 1
 	if copies != "" {
@@ -118,7 +152,6 @@ func PrintFile(printer string, filePath string, copies string) error {
 	// Gửi lệnh in nhiều bản
 	for i := 0; i < numCopies; i++ {
 		_, err = printerConn.Write(printCmd)
-
 		// Thêm vài dòng trắng dòng trắng sau khi in ảnh
 		printerConn.Write([]byte{0x0A, 0x0A, 0x0A, 0x0A})
 		// conn.Write([]byte{0x0A, 0x0A})
@@ -128,6 +161,9 @@ func PrintFile(printer string, filePath string, copies string) error {
 			log.Println("Gửi lệnh in fail: ", err)
 			return err
 		}
+
+		// await 1 second between copies
+		time.Sleep(1 * time.Second)
 	}
 
 	return nil

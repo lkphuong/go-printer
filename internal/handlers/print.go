@@ -81,7 +81,7 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	}
 
 	if len(files) == 0 {
-		utils.ResponseError(c, http.StatusBadRequest, "No files uploaded", nil)
+		utils.ResponseError(c, http.StatusBadRequest, "no_files_uploaded", nil)
 		return
 	}
 

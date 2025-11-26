@@ -152,7 +152,7 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 
 	// gửi in cho từng printer
 	for _, printer := range printers {
-		if err := utils.PrintFile(printer, tempFilePath, copies); err != nil {
+		if err := utils.PrintFileQueued(printer, tempFilePath, copies); err != nil {
 			log.Println("print file error: ", err)
 			return err
 		}
