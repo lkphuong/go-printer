@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	_ "image/jpeg"
 	"log"
 	"net"
 	"os"
@@ -30,6 +31,10 @@ func GetPrinters() ([]string, error) {
 			printerName := fields[0]
 			portName := fields[3]
 			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
+			if !strings.HasPrefix(printerName, "---") {
+				lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
+			}
+
 		}
 
 		return lines, nil // iTP86|192.168.1.100:9100
