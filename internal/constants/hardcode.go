@@ -19,4 +19,5 @@ const (
 	PAPER_NEAR_OUT  = "paper_near_out"  // Giấy gần hết
 	CUT_ERROR       = "cut_error"       // lỗi cắt giấy
 	UNKNOWN_ERROR   = "unknown_error"   // lỗi không xác định
+	QUEUE_FULL      = "queue_full"      // hàng đợi in đầy
 )

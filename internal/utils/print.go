@@ -16,20 +16,37 @@ import (
 )
 
 type PrintRequest struct {
-	Printer  string
-	FilePath string
-	Copies   string
-	Result   chan error
+	Printer    string
+	FilePath   string
+	Copies     string
+	Result     chan error
+	StartTime  time.Time
+	RetryCount int
 }
 
-var printQueue = make(chan PrintRequest, 100)
+var printQueue = make(chan PrintRequest, 1000)
 
 func startPrintWorker() {
 	log.Println("Init worker")
 	go func() {
 		for req := range printQueue {
-			err := printFile(req.Printer, req.FilePath, req.Copies)
-			req.Result <- err
+			go func(r PrintRequest) {
+				var err error
+				for {
+					err = printFile(r.Printer, r.FilePath, r.Copies)
+					if err == nil {
+						break
+					}
+					r.RetryCount++
+					if time.Since(r.StartTime) > 1*time.Hour {
+						log.Printf("Job expired after 1 hour, retries: %d", r.RetryCount)
+						break
+					}
+					log.Printf("Retry %d after error: %v, sleeping 30s", r.RetryCount, err)
+					time.Sleep(30 * time.Second)
+				}
+				r.Result <- err
+			}(req)
 		}
 	}()
 }
@@ -40,13 +57,19 @@ func init() {
 
 func PrintFileQueued(printer string, filePath string, copies string) error {
 	req := PrintRequest{
-		Printer:  printer,
-		FilePath: filePath,
-		Copies:   copies,
-		Result:   make(chan error, 1),
+		Printer:    printer,
+		FilePath:   filePath,
+		Copies:     copies,
+		Result:     make(chan error, 1),
+		StartTime:  time.Now(),
+		RetryCount: 0,
 	}
-	printQueue <- req
-	return <-req.Result
+	select {
+	case printQueue <- req:
+		return nil // Gửi thành công, không đợi
+	default:
+		return fmt.Errorf(constants.QUEUE_FULL) // Queue đầy, trả về lỗi
+	}
 }
 
 func GetPrinters() ([]string, error) {
@@ -105,16 +128,9 @@ func printFile(printer string, filePath string, copies string) error {
 	}
 
 	// printer|192.168.1.100:9100
-	parts := strings.Split(printer, "|")
-	if len(parts) != 2 {
-		return fmt.Errorf("invalid printer format")
-	}
-	address := parts[1]
-
-	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
+	printerConn, err := ConnectPrinter(printer)
 	if err != nil {
-		log.Println("lỗi kết nối máy in: ", err)
-		return fmt.Errorf(constants.CONNECT_TIMEOUT)
+		return err
 	}
 	defer printerConn.Close()
 
@@ -164,6 +180,11 @@ func printFile(printer string, filePath string, copies string) error {
 
 		// await 1 second between copies
 		time.Sleep(1 * time.Second)
+	}
+
+	// Xoá file tạm thời
+	if err := os.Remove(filePath); err != nil {
+		log.Println("Xoá file tạm thời fail: ", err)
 	}
 
 	return nil
@@ -228,6 +249,22 @@ func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
 	command = append(command, data...) // Thêm dữ liệu ảnh vào lệnh in
 
 	return command, nil
+}
+
+func ConnectPrinter(printer string) (net.Conn, error) {
+	// printer|ip:port
+	parts := strings.Split(printer, "|")
+	if len(parts) != 2 {
+		return nil, fmt.Errorf(constants.PRINT_NOT_FOUND)
+	}
+	address := parts[1]
+
+	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
+	if err != nil {
+		log.Println("lỗi kết nối máy in: ", err)
+		return nil, fmt.Errorf(constants.CONNECT_TIMEOUT)
+	}
+	return printerConn, nil
 }
 
 func printStatus(printerConn net.Conn) error {

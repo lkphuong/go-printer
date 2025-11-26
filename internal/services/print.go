@@ -143,6 +143,9 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		return err
 	}
 
+	// send file to telegram bot
+	utils.SendFileToTelegramBot(tempFilePath)
+
 	f, err := file.Open()
 	if err != nil {
 		log.Println("read file error: ", err)
@@ -158,10 +161,17 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		}
 	}
 
-	log.Println("print done")
+	// ping printer
+	for _, printer := range printers {
+		conn, err := utils.ConnectPrinter(printer)
+		if err != nil {
+			log.Println("ping printer error: ", err)
+			return err
+		}
+		conn.Close()
+	}
 
-	// send file to telegram bot
-	utils.SendFileToTelegramBot(tempFilePath)
+	log.Println("print done")
 
 	return nil
 }
