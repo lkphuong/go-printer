@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"go-printer/internal/constants"
 	"image"
 	_ "image/jpeg"
 	"log"
@@ -76,9 +77,10 @@ func PrintFile(printer string, filePath string, copies string) error {
 	}
 	address := parts[1]
 
-	printerConn, err := net.Dial("tcp", address)
+	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
 	if err != nil {
-		log.Fatalf("Lỗi kết nối máy in: %v", err)
+		log.Println("lỗi kết nối máy in: ", err)
+		return fmt.Errorf(constants.CONNECT_TIMEOUT)
 	}
 	defer printerConn.Close()
 
@@ -214,32 +216,33 @@ func printStatus(printerConn net.Conn) error {
 	// Log các lỗi dựa trên bit
 	errors := []string{}
 	if status&0x01 != 0 {
-		errors = append(errors, "Offline")
+		errors = append(errors, constants.OFFLINE)
 	}
 	if status&0x02 != 0 {
-		errors = append(errors, "Nắp mở")
+		errors = append(errors, constants.OPEN)
 	}
 	if status&0x04 != 0 {
-		errors = append(errors, "Nút cấp giấy được nhấn")
+		errors = append(errors, constants.PAPER_JAM)
 	}
 	if status&0x08 != 0 {
-		errors = append(errors, "Hết giấy")
+		errors = append(errors, constants.PAPER_OUT)
 	}
 	if status&0x10 != 0 {
-		errors = append(errors, "Lỗi")
+		errors = append(errors, constants.CONNECT_TIMEOUT)
 	}
 	if status&0x20 != 0 {
-		errors = append(errors, "Giấy gần hết")
+		errors = append(errors, constants.PAPER_NEAR_OUT)
 	}
 	if status&0x40 != 0 {
-		errors = append(errors, "Lỗi cắt giấy")
+		errors = append(errors, constants.CUT_ERROR)
 	}
 	if status&0x80 != 0 {
-		errors = append(errors, "Lỗi không khắc phục")
+		errors = append(errors, constants.UNKNOWN_ERROR)
 	}
 
 	if len(errors) > 0 {
-		return fmt.Errorf("lỗi máy in: %v", errors)
+		log.Println("Lỗi máy in: ", strings.Join(errors, ", "))
+		return fmt.Errorf(constants.UNKNOWN_ERROR)
 	}
 
 	return nil
