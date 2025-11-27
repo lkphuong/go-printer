@@ -153,6 +153,19 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	}
 	defer f.Close()
 
+	var errFinal error
+
+	// ping printer
+	for _, printer := range printers {
+		conn, err := utils.ConnectPrinter(printer)
+		if err != nil {
+			log.Println("ping printer error: ", err)
+			errFinal = err
+			break
+		}
+		conn.Close()
+	}
+
 	// gửi in cho từng printer
 	for _, printer := range printers {
 		if err := utils.PrintFileQueued(printer, tempFilePath, copies); err != nil {
@@ -161,14 +174,8 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 		}
 	}
 
-	// ping printer
-	for _, printer := range printers {
-		conn, err := utils.ConnectPrinter(printer)
-		if err != nil {
-			log.Println("ping printer error: ", err)
-			return err
-		}
-		conn.Close()
+	if errFinal != nil {
+		return errFinal
 	}
 
 	log.Println("print done")

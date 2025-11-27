@@ -27,7 +27,7 @@ type PrintRequest struct {
 var printQueue = make(chan PrintRequest, 1000)
 
 func startPrintWorker() {
-	log.Println("Init worker")
+	log.Println("Starting print worker...")
 	go func() {
 		for req := range printQueue {
 			go func(r PrintRequest) {
@@ -40,6 +40,10 @@ func startPrintWorker() {
 					r.RetryCount++
 					if time.Since(r.StartTime) > 1*time.Hour {
 						log.Printf("Job expired after 1 hour, retries: %d", r.RetryCount)
+						// xoá file tạm thời
+						if err := os.Remove(r.FilePath); err != nil {
+							log.Println("Xoá file tạm thời fail: ", err)
+						}
 						break
 					}
 					log.Printf("Retry %d after error: %v, sleeping 30s", r.RetryCount, err)
@@ -178,8 +182,8 @@ func printFile(printer string, filePath string, copies string) error {
 			return err
 		}
 
-		// await 1 second between copies
-		time.Sleep(1 * time.Second)
+		// await 0.5 second between copies
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	// Xoá file tạm thời
