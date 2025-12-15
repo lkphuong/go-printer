@@ -186,11 +186,6 @@ func printFile(printer string, filePath string, copies string) error {
 		time.Sleep(500 * time.Millisecond)
 	}
 
-	// Xoá file tạm thời
-	if err := os.Remove(filePath); err != nil {
-		log.Println("Xoá file tạm thời fail: ", err)
-	}
-
 	return nil
 }
 

@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -101,10 +102,44 @@ func NewApp() *App {
 	return app
 }
 
+func cleanupFolder() {
+	// cleanup at 5:00 AM
+	currentTime := time.Now()
+	log.Println("hour: ", currentTime.Hour())
+	if currentTime.Hour() <= 4 || currentTime.Hour() > 6 {
+		log.Println("Not time for cleanup yet.")
+		return
+	}
+	log.Println("Running cleanup of uploads folder...")
+	uploadsDir := filepath.Join(".", "uploads")
+	files, err := os.ReadDir(uploadsDir)
+	if err != nil {
+		log.Println("Error reading uploads directory:", err)
+		return
+	}
+	for _, file := range files {
+		_ = os.Remove(filepath.Join(uploadsDir, file.Name()))
+	}
+
+	log.Println("Cleanup completed.")
+}
+
 func (a *App) Run() {
 	log.Println("Server starting on :9099")
 	if a.router == nil {
 		log.Fatal("router is nil, check NewApp() initialization")
 	}
+
+	go func() {
+		// interval to run cleanupFolder every day at 5:00 AM
+		ticker := time.NewTicker(1 * time.Minute)
+		defer ticker.Stop()
+		for {
+			cleanupFolder()
+			<-ticker.C
+		}
+	}()
+
 	a.router.Run(":9099")
+
 }
