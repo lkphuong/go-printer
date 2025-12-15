@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type App struct {
@@ -56,7 +57,7 @@ func (a *App) setupRouter() {
 }
 
 func initializing() {
-	//init folder database, uploads
+	// init folder database, uploads, logs
 	log.Println("Initializing folders...")
 	uploadsDir := filepath.Join(".", "uploads")
 	os.MkdirAll(uploadsDir, 0755)
@@ -64,18 +65,19 @@ func initializing() {
 	configDir := filepath.Join(".", "config")
 	os.MkdirAll(configDir, 0755)
 
-	//init config.json
-	configsFile := filepath.Join(configDir, "config.json")
+	logsDir := filepath.Join(".", "logs")
+	os.MkdirAll(logsDir, 0755)
 
+	// init config.json
+	configsFile := filepath.Join(configDir, "config.json")
 	if _, err := os.Stat(configsFile); os.IsNotExist(err) {
 		emptyConfigs := []interface{}{}
 		data, _ := json.MarshalIndent(emptyConfigs, "", "  ")
 		os.WriteFile(configsFile, data, 0644)
 	}
 
-	//init device.json
+	// init device.json
 	deviceFile := filepath.Join(configDir, "device.json")
-
 	if _, err := os.Stat(deviceFile); os.IsNotExist(err) {
 		defaultDeviceConfig := map[string]string{
 			"location": "office",
@@ -84,7 +86,18 @@ func initializing() {
 		os.WriteFile(deviceFile, data, 0644)
 	}
 
-	log.Println("Folders initialized.")
+	// setup log file with lumberjack
+	logFile := filepath.Join(logsDir, "app.log")
+	log.SetOutput(&lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    50, // megabytes before rotating
+		MaxBackups: 0,  // unlimited backups
+		MaxAge:     14, // days
+		Compress:   false,
+	})
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	log.Println("Folders and logger initialized.")
 }
 
 func NewApp() *App {
@@ -115,13 +128,35 @@ func cleanupFolder() {
 	files, err := os.ReadDir(uploadsDir)
 	if err != nil {
 		log.Println("Error reading uploads directory:", err)
-		return
-	}
-	for _, file := range files {
-		_ = os.Remove(filepath.Join(uploadsDir, file.Name()))
+	} else {
+		for _, file := range files {
+			_ = os.Remove(filepath.Join(uploadsDir, file.Name()))
+		}
+		log.Println("Uploads cleanup completed.")
 	}
 
-	log.Println("Cleanup completed.")
+	// cleanup logs older than 14 days
+	logsDir := filepath.Join(".", "logs")
+	files, err = os.ReadDir(logsDir)
+	if err != nil {
+		log.Println("Error reading logs directory:", err)
+		return
+	}
+	now := time.Now()
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+		if now.Sub(info.ModTime()) > 14*24*time.Hour {
+			os.Remove(filepath.Join(logsDir, file.Name()))
+			log.Printf("Deleted old log file: %s", file.Name())
+		}
+	}
+	log.Println("Logs cleanup completed.")
 }
 
 func (a *App) Run() {

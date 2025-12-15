@@ -1,0 +1,26 @@
+2025/12/15 23:50:06 app.go:100: Folders and logger initialized.
+2025/12/15 23:50:06 app.go:163: Server starting on :9099
+2025/12/15 23:50:06 app.go:121: hour:  23
+2025/12/15 23:50:06 app.go:123: Not time for cleanup yet.
+2025/12/15 23:50:10 print.go:78: copies:  1
+2025/12/15 23:50:15 print.go:263: lỗi kết nối máy in:  dial tcp 192.168.1.100:9100: i/o timeout
+2025/12/15 23:50:15 print.go:162: ping printer error:  connect_timeout
+2025/12/15 23:50:15 response.go:25: error message:  connect_timeout
+2025/12/15 23:50:15 print.go:263: lỗi kết nối máy in:  dial tcp 192.168.1.100:9100: connect: no route to host
+2025/12/15 23:50:15 print.go:49: Retry 1 after error: connect_timeout, sleeping 30s
+2025/12/15 23:50:43 response.go:25: error message:  Printer config not found
+2025/12/15 23:50:44 response.go:25: error message:  Printer config not found
+2025/12/15 23:50:45 response.go:25: error message:  Printer config not found
+2025/12/15 23:50:50 print.go:263: lỗi kết nối máy in:  dial tcp 192.168.1.100:9100: i/o timeout
+2025/12/15 23:50:50 print.go:49: Retry 2 after error: connect_timeout, sleeping 30s
+2025/12/15 23:51:06 app.go:121: hour:  23
+2025/12/15 23:51:06 app.go:123: Not time for cleanup yet.
+2025/12/15 23:51:20 print.go:263: lỗi kết nối máy in:  dial tcp 192.168.1.100:9100: connect: no route to host
+2025/12/15 23:51:20 print.go:49: Retry 3 after error: connect_timeout, sleeping 30s
+2025/12/15 23:51:37 response.go:25: error message:  Printer config not found
+2025/12/15 23:51:38 response.go:25: error message:  Printer config not found
+2025/12/15 23:51:39 response.go:25: error message:  Printer config not found
+2025/12/15 23:51:55 print.go:263: lỗi kết nối máy in:  dial tcp 192.168.1.100:9100: i/o timeout
+2025/12/15 23:51:55 print.go:49: Retry 4 after error: connect_timeout, sleeping 30s
+2025/12/15 23:52:06 app.go:121: hour:  23
+2025/12/15 23:52:06 app.go:123: Not time for cleanup yet.
