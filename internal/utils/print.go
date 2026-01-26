@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -88,13 +89,20 @@ func GetPrinters() ([]string, error) {
 		}
 		// return array of printer names:portName
 		lines := []string{}
+
+		rexIp := regexp.MustCompile(`\b(?:\d{1,3}\.){3}\d{1,3}\b`)
+
 		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n")[2:] {
-			fields := strings.Fields(line)
-			printerName := fields[0]
-			portName := fields[3]
-			if !strings.HasPrefix(printerName, "---") {
-				lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, portName))
+
+			ip := rexIp.FindString(line)
+			if ip == "" {
+				continue
 			}
+
+			// tên máy in trước chữ local
+			printerName := strings.TrimSpace(strings.Split(line, "Local")[0])
+
+			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, ip))
 
 		}
 

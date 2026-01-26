@@ -167,7 +167,7 @@ func (a *App) Run() {
 
 	go func() {
 		// interval to run cleanupFolder every day at 5:00 AM
-		ticker := time.NewTicker(1 * time.Minute)
+		ticker := time.NewTicker(1 * time.Hour)
 		defer ticker.Stop()
 		for {
 			cleanupFolder()
