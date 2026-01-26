@@ -9,4 +9,7 @@ Trong folder configs
 
 Lưu ý vận hành:
 
+- Phải cài đặt driver máy in trước (chọn loại kết nói là icp ip)
+- Nếu không có tcp/ip cấu hình thủ công, vào phần printer trên windown, chọn máy in manage, printer properites
+  port -> add port -> new port type -> nhập ip port máy in -> apply + oke
 - Máy cài đặt phải chung mạng LAN với máy in, luôn đảm bảo thiết bị có internet để gửi tín hiệu tới máy in
