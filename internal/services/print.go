@@ -2,14 +2,13 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
-	"go-printer/internal/constants"
 	"go-printer/internal/dto/response"
 	"go-printer/internal/utils"
 	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -109,7 +108,7 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 	return nil
 }
 
-func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string, file *multipart.FileHeader) error {
+func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, file *multipart.FileHeader) error {
 
 	// lấy print từ file json
 	data, err := os.ReadFile("./config/config.json")
@@ -120,20 +119,6 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	var config []response.PrintConfigResponse
 	if err := json.Unmarshal(data, &config); err != nil {
 		return err
-	}
-
-	// lấy những printer theo type
-	printers := []string{}
-	for _, c := range config {
-		for _, t := range c.Type {
-			if t == printType {
-				printers = append(printers, c.PrinterName)
-			}
-		}
-	}
-
-	if len(printers) == 0 {
-		return fmt.Errorf(constants.PRINT_NOT_FOUND)
 	}
 
 	// save file tạm thời
@@ -153,31 +138,22 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	}
 	defer f.Close()
 
-	var errFinal error
-
 	// ping printer
-	for _, printer := range printers {
-		conn, err := utils.ConnectPrinter(printer)
-		if err != nil {
-			log.Println("ping printer error: ", err)
-			errFinal = err
-			break
-		}
+	// iTP86|192.168.1.100:9100
+	ipPrinter := strings.Split(printer, "|")[1]
+	conn, err := utils.ConnectPrinter(ipPrinter)
+	if err != nil {
+		log.Println("ping printer error: ", err)
 		conn.Close()
+		return err
 	}
 
 	// gửi in cho từng printer
-	for _, printer := range printers {
-		if err := utils.PrintFileQueued(printer, tempFilePath, copies); err != nil {
-			log.Println("print file error: ", err)
-			return err
-		}
+	err = utils.PrintFileQueued(ipPrinter, tempFilePath, copies)
+	if err != nil {
+		log.Println("print file error: ", err)
+		return err
 	}
-
-	if errFinal != nil {
-		return errFinal
-	}
-
 	log.Println("print done")
 
 	return nil
