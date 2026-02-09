@@ -141,10 +141,9 @@ func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, 
 	// ping printer
 	// iTP86|192.168.1.100:9100
 	ipPrinter := strings.Split(printer, "|")[1]
-	conn, err := utils.ConnectPrinter(ipPrinter)
+	_, err = utils.ConnectPrinter(ipPrinter)
 	if err != nil {
 		log.Println("ping printer error: ", err)
-		conn.Close()
 		return err
 	}
 
