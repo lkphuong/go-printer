@@ -64,3 +64,113 @@
 2026/02/02 17:47:56 app.go:163: Server starting on :9099
 2026/02/02 17:47:56 app.go:121: hour:  17
 2026/02/02 17:47:56 app.go:123: Not time for cleanup yet.
+2026/02/10 08:54:10 app.go:100: Folders and logger initialized.
+2026/02/10 08:54:10 app.go:163: Server starting on :9099
+2026/02/10 08:54:10 app.go:121: hour:  8
+2026/02/10 08:54:10 app.go:123: Not time for cleanup yet.
+2026/02/10 08:54:43 print.go:78: copies:  1
+2026/02/10 08:54:43 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:54:43 response.go:25: error message:  print_not_found
+2026/02/10 08:54:44 print.go:78: copies:  1
+2026/02/10 08:54:44 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:54:44 response.go:25: error message:  print_not_found
+2026/02/10 08:54:45 print.go:78: copies:  1
+2026/02/10 08:54:45 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:54:45 response.go:25: error message:  print_not_found
+2026/02/10 08:54:45 print.go:78: copies:  1
+2026/02/10 08:54:45 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:54:45 response.go:25: error message:  print_not_found
+2026/02/10 08:59:10 print.go:78: copies:  1
+2026/02/10 08:59:10 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:59:10 response.go:25: error message:  print_not_found
+2026/02/10 08:59:11 print.go:78: copies:  1
+2026/02/10 08:59:11 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:59:11 response.go:25: error message:  print_not_found
+2026/02/10 08:59:12 print.go:78: copies:  1
+2026/02/10 08:59:12 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:59:12 response.go:25: error message:  print_not_found
+2026/02/10 08:59:13 print.go:78: copies:  1
+2026/02/10 08:59:13 print.go:146: ping printer error:  print_not_found
+2026/02/10 08:59:13 response.go:25: error message:  print_not_found
+2026/02/10 08:59:48 app.go:100: Folders and logger initialized.
+2026/02/10 08:59:48 app.go:163: Server starting on :9099
+2026/02/10 08:59:48 app.go:121: hour:  8
+2026/02/10 08:59:48 app.go:123: Not time for cleanup yet.
+2026/02/10 08:59:49 print.go:78: copies:  1
+2026/02/10 08:59:49 print.go:264: Kết nối máy in:  80mm Series Printer 2|192.168.1.116:9100
+2026/02/10 08:59:51 print.go:78: copies:  1
+2026/02/10 08:59:51 print.go:264: Kết nối máy in:  80mm Series Printer 2|192.168.1.116:9100
+2026/02/10 08:59:54 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 08:59:54 print.go:144: ping printer error:  connect_timeout
+2026/02/10 08:59:54 response.go:25: error message:  connect_timeout
+2026/02/10 08:59:56 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 08:59:56 print.go:144: ping printer error:  connect_timeout
+2026/02/10 08:59:56 response.go:25: error message:  connect_timeout
+2026/02/10 09:00:18 app.go:100: Folders and logger initialized.
+2026/02/10 09:00:18 app.go:163: Server starting on :9099
+2026/02/10 09:00:18 app.go:121: hour:  9
+2026/02/10 09:00:18 app.go:123: Not time for cleanup yet.
+2026/02/10 09:00:22 print.go:78: copies:  1
+2026/02/10 09:00:27 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:00:27 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:00:27 response.go:25: error message:  connect_timeout
+2026/02/10 09:01:33 app.go:100: Folders and logger initialized.
+2026/02/10 09:01:33 app.go:163: Server starting on :9099
+2026/02/10 09:01:33 app.go:121: hour:  9
+2026/02/10 09:01:33 app.go:123: Not time for cleanup yet.
+2026/02/10 09:01:38 print.go:78: copies:  1
+2026/02/10 09:01:43 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:01:43 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:01:43 response.go:25: error message:  connect_timeout
+2026/02/10 09:01:52 app.go:100: Folders and logger initialized.
+2026/02/10 09:01:52 app.go:163: Server starting on :9099
+2026/02/10 09:01:52 app.go:121: hour:  9
+2026/02/10 09:01:52 app.go:123: Not time for cleanup yet.
+2026/02/10 09:01:54 print.go:78: copies:  1
+2026/02/10 09:01:54 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: no route to host
+2026/02/10 09:01:54 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:01:54 response.go:25: error message:  connect_timeout
+2026/02/10 09:02:36 app.go:100: Folders and logger initialized.
+2026/02/10 09:02:36 app.go:163: Server starting on :9099
+2026/02/10 09:02:36 app.go:121: hour:  9
+2026/02/10 09:02:36 app.go:123: Not time for cleanup yet.
+2026/02/10 09:02:41 print.go:78: copies:  1
+2026/02/10 09:02:46 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:02:46 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:02:46 response.go:25: error message:  connect_timeout
+2026/02/10 09:02:48 print.go:78: copies:  1
+2026/02/10 09:02:48 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: no route to host
+2026/02/10 09:02:48 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:02:48 response.go:25: error message:  connect_timeout
+2026/02/10 09:02:51 print.go:78: copies:  1
+2026/02/10 09:02:51 print.go:272: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: host is down
+2026/02/10 09:02:51 print.go:144: ping printer error:  connect_timeout
+2026/02/10 09:02:51 response.go:25: error message:  connect_timeout
+2026/02/10 09:05:43 app.go:100: Folders and logger initialized.
+2026/02/10 09:05:43 app.go:163: Server starting on :9099
+2026/02/10 09:05:43 app.go:121: hour:  9
+2026/02/10 09:05:43 app.go:123: Not time for cleanup yet.
+2026/02/10 09:05:46 print.go:78: copies:  1
+2026/02/10 09:05:46 print.go:154: print done
+2026/02/10 09:05:51 print.go:271: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:05:51 print.go:50: Retry 1 after error: connect_timeout, sleeping 30s
+2026/02/10 09:06:21 print.go:271: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: no route to host
+2026/02/10 09:06:21 print.go:50: Retry 2 after error: connect_timeout, sleeping 30s
+2026/02/10 09:06:56 print.go:271: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:06:56 print.go:50: Retry 3 after error: connect_timeout, sleeping 30s
+2026/02/10 09:08:11 app.go:100: Folders and logger initialized.
+2026/02/10 09:08:11 app.go:163: Server starting on :9099
+2026/02/10 09:08:11 app.go:121: hour:  9
+2026/02/10 09:08:11 app.go:123: Not time for cleanup yet.
+2026/02/10 09:09:43 app.go:100: Folders and logger initialized.
+2026/02/10 09:09:43 app.go:163: Server starting on :9099
+2026/02/10 09:09:43 app.go:121: hour:  9
+2026/02/10 09:09:43 app.go:123: Not time for cleanup yet.
+2026/02/10 09:09:51 print.go:78: copies:  1
+2026/02/10 09:09:51 print.go:154: print done
+2026/02/10 09:09:51 print.go:279: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: no route to host
+2026/02/10 09:09:51 print.go:52: Retry 1 after error: connect_timeout, sleeping 30s
+2026/02/10 09:10:26 print.go:279: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: i/o timeout
+2026/02/10 09:10:26 print.go:52: Retry 2 after error: connect_timeout, sleeping 30s
+2026/02/10 09:10:56 print.go:279: lỗi kết nối máy in:  dial tcp 192.168.1.116:9100: connect: no route to host
+2026/02/10 09:10:56 print.go:52: Retry 3 after error: connect_timeout, sleeping 30s

@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -140,15 +139,14 @@ func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, 
 
 	// ping printer
 	// iTP86|192.168.1.100:9100
-	ipPrinter := strings.Split(printer, "|")[1]
-	_, err = utils.ConnectPrinter(ipPrinter)
-	if err != nil {
-		log.Println("ping printer error: ", err)
-		return err
-	}
+	// _, err = utils.ConnectPrinter(printer)
+	// if err != nil {
+	// 	log.Println("ping printer error: ", err)
+	// 	return err
+	// }
 
 	// gửi in cho từng printer
-	err = utils.PrintFileQueued(ipPrinter, tempFilePath, copies)
+	err = utils.PrintFileQueued(printer, tempFilePath, copies)
 	if err != nil {
 		log.Println("print file error: ", err)
 		return err
