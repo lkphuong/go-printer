@@ -28,6 +28,7 @@ var printQueue = make(chan PrintRequest, 1000)
 
 func startPrintWorker() {
 	log.Println("Starting print worker...")
+	fmt.Printf("Starting print worker...\n")
 	go func() {
 		for req := range printQueue {
 			go func(r PrintRequest) {
@@ -40,6 +41,7 @@ func startPrintWorker() {
 					r.RetryCount++
 					if time.Since(r.StartTime) > 1*time.Hour {
 						log.Printf("Job expired after 1 hour, retries: %d", r.RetryCount)
+						fmt.Printf("Job expired after 1 hour, retries: %d\n", r.RetryCount)
 						// xoá file tạm thời
 						if err := os.Remove(r.FilePath); err != nil {
 							log.Println("Xoá file tạm thời fail: ", err)
@@ -47,6 +49,7 @@ func startPrintWorker() {
 						break
 					}
 					log.Printf("Retry %d after error: %v, sleeping 30s", r.RetryCount, err)
+					fmt.Printf("Retry %d after error: %v, sleeping 30s\n", r.RetryCount, err)
 					time.Sleep(30 * time.Second)
 				}
 				r.Result <- err
@@ -148,6 +151,7 @@ func printFile(ip string, filePath string, copies string) error {
 	err = printStatus(printerConn)
 	if err != nil {
 		log.Println("Lỗi trạng thái máy in: ", err)
+		fmt.Printf("Lỗi trạng thái máy in: %v\n", err)
 		return err
 	}
 
@@ -155,6 +159,7 @@ func printFile(ip string, filePath string, copies string) error {
 	imgFile, err := os.Open(filePath)
 	if err != nil {
 		log.Println("Mở file ảnh fail: ", err)
+		fmt.Printf("Mở file ảnh fail: %v\n", err)
 		return err
 	}
 	defer imgFile.Close()
@@ -163,6 +168,7 @@ func printFile(ip string, filePath string, copies string) error {
 	img, _, err := image.Decode(imgFile)
 	if err != nil {
 		log.Println("Giải mã ảnh fail: ", err)
+		fmt.Printf("Giải mã ảnh fail: %v\n", err)
 		return err
 	}
 
@@ -170,6 +176,7 @@ func printFile(ip string, filePath string, copies string) error {
 	printCmd, err := printImageCommand(img, MaxPrinterDots)
 	if err != nil {
 		log.Println("Tạo lệnh in ảnh fail: ", err)
+		fmt.Printf("Tạo lệnh in ảnh fail: %v\n", err)
 		return err
 	}
 
@@ -183,6 +190,7 @@ func printFile(ip string, filePath string, copies string) error {
 
 		if err != nil {
 			log.Println("Gửi lệnh in fail: ", err)
+			fmt.Printf("Gửi lệnh in fail: %v\n", err)
 			return err
 		}
 
@@ -261,6 +269,7 @@ func ConnectPrinter(ip string) (net.Conn, error) {
 	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
 	if err != nil {
 		log.Println("lỗi kết nối máy in: ", err)
+		fmt.Printf("Lỗi kết nối máy in: %v\n", err)
 		return nil, fmt.Errorf(constants.CONNECT_TIMEOUT)
 	}
 	return printerConn, nil

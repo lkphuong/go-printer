@@ -1,73 +1,60 @@
-## In Trên macOS/Linux
+# Hướng Dẫn Cài Đặt Dịch Vụ Máy In
 
-Trên macOS và Linux, hệ thống in thường dựa trên CUPS (Common Unix Printing System). Bạn có thể sử dụng lệnh `lpstat` để kiểm tra trạng thái máy in và các công việc in đang chờ.
+## Tổng Quan
 
-### Bước 1: Tìm Máy In
+Dịch vụ máy in này là một ứng dụng Go cung cấp API REST để quản lý máy in, cấu hình in ấn và gửi công việc in. Ứng dụng hỗ trợ đa nền tảng (Windows, macOS, Linux) và sử dụng kết nối TCP/IP để giao tiếp với máy in.
 
-Mở Terminal và chạy lệnh sau để xem danh sách máy in có sẵn:
+## Yêu Cầu Hệ Thống
 
-```
-lpstat -p
-```
+- **Hệ điều hành**: Windows, macOS hoặc Linux.
+- **Máy in**: Máy in hỗ trợ giao thức ESC/POS qua TCP/IP (thường là port 9100).
+- **Driver máy in**: Cần cài đặt driver máy in trước khi sử dụng.
 
-Lệnh này sẽ hiển thị các máy in đã cài đặt và trạng thái của chúng (ví dụ: ipos, canon).
+## Cài Đặt
 
-### Bước 2: In
+### Bước 1: Tải Xuống Ứng Dụng
 
-Để in một file (ví dụ: PDF hoặc văn bản), sử dụng lệnh `lp`:
+- Tải file thực thi.
 
-```
-lp filename.pdf
-```
+### Bước 2: Chuẩn Bị Thư Mục
 
-- Thay `filename.pdf` bằng tên file bạn muốn in.
-- Bạn có thể chỉ định máy in cụ thể bằng tùy chọn `-d`:
-  ```
-  lp -d printer_name filename.pdf
-  ```
+- Tạo một thư mục riêng để chứa chương trình.
+- Sao chép file thực thi (ví dụ: `printer-amd64.exe`) vào thư mục này.
 
-### Bước 3: Kiểm Tra Queue
+### Bước 3: Khởi Động Ứng Dụng
 
-Sau khi gửi in, kiểm tra trạng thái:
+- Nhấp đúp vào file thực thi để chạy (trên Windows) hoặc chạy từ terminal:
+- Lần đầu tiên chạy, ứng dụng sẽ tự động khởi tạo các thư mục và file cấu hình cần thiết:
+  - `config/`: Chứa file cấu hình.
+  - `uploads/`: Chứa file tải lên tạm thời.
+  - `logs/`: Chứa file log.
 
-```
-lpstat -o
-```
+### Bước 4: Cấu Hình Máy In
 
-Lệnh này liệt kê các công việc in đang chờ hoặc đang xử lý.
+- **Cài đặt driver máy in**: Đảm bảo máy in được cài đặt với chế độ kết nối TCP/IP. Trên Windows, vào **Settings > Devices > Printers & scanners** để kiểm tra.
+- **Cấu hình port thủ công (nếu cần)**:
+  - Vào **Printer Properties > Ports**.
+  - Chọn **Add Port > New Port Type**.
+  - Nhập địa chỉ IP và port của máy in (thường là port 9100).
+  - Áp dụng và xác nhận.
+- **File cấu hình**:
+  - `config/device.json`: Lưu thông tin về máy đang chạy dịch vụ (ví dụ: vị trí, tên máy). Thay đổi để dễ dàng kiểm tra lỗi và log.
+  - `config/config.json`: Lưu cấu hình máy in (IP, port, loại in). File này được quản lý tự động bởi hệ thống; không khuyến nghị chỉnh sửa thủ công để tránh lỗi kết nối.
 
-### Note
+## Chạy Ứng Dụng
 
-- Đảm bảo máy in đã được cài đặt và kết nối đúng cách qua System Preferences (macOS) hoặc CUPS web interface (Linux).
-- Nếu gặp vấn đề, kiểm tra log của CUPS hoặc khởi động lại dịch vụ in.
+- Ứng dụng sẽ chạy trên port 9099.
 
-## In Trên Windows
+## Lưu Ý Vận Hành
 
-Trên Windows, việc in thường yêu cầu qua một ứng dụng trung gian vì hệ thống không hỗ trợ gửi trực tiếp file đến máy in từ dòng lệnh như trên Unix-based systems.
+- Máy cài đặt phải cùng mạng LAN với máy in và có kết nối internet để gửi tín hiệu.
+- Đảm bảo firewall không chặn port 9100 hoặc 9099.
+- Log được lưu trong `logs/app.log` với rotation tự động (tối đa 50MB, giữ 14 ngày).
+- Ứng dụng tự động dọn dẹp file tạm trong `uploads/` lúc 5:00 AM hàng ngày.
+- Nếu gặp lỗi, kiểm tra log hoặc khởi động lại dịch vụ.
 
-### Bước 1: Sử Dụng Paint (MSPaint)
+## Xử Lý Sự Cố
 
-Windows có sẵn ứng dụng Paint (mspaint.exe), có thể dùng để in file hình ảnh hoặc văn bản.
-
-- Mở Command Prompt hoặc PowerShell.
-- Chạy lệnh:
-  ```
-  mspaint /pt "C:\path\to\filename.jpg"
-  ```
-  - Thay `C:\path\to\filename.jpg` bằng đường dẫn đầy đủ đến file bạn muốn in.
-  - Lệnh này sẽ mở file trong Paint và tự động in nó ra máy in mặc định.
-
-### Tại Sao Dùng Paint?
-
-- Paint có sẵn trên mọi phiên bản Windows, không cần cài đặt thêm.
-- Bạn cũng có thể dùng Microsoft Edge hoặc các ứng dụng khác như Adobe Reader cho PDF, nhưng Paint là lựa chọn đơn giản nhất cho hình ảnh.
-
-### Bước 2: Kiểm Tra Máy In
-
-- Mở Settings > Devices > Printers & scanners để xem danh sách máy in.
-- Nếu cần in qua máy in cụ thể, mở file trong ứng dụng tương ứng và chọn máy in từ dialog in.
-
-### Note
-
-- Đảm bảo máy in đã được cài đặt driver và kết nối.
-- Nếu file không phải hình ảnh, chuyển đổi sang định dạng hỗ trợ (ví dụ: PDF sang JPG) trước khi in.
+- **Không tìm thấy máy in**: Kiểm tra `config/config.json` và đảm bảo máy in được cấu hình đúng.
+- **Lỗi kết nối**: Kiểm tra IP/port và firewall.
+- **File không in được**: Đảm bảo file là hình ảnh (JPEG/PNG) và kích thước hợp lý (tối đa 576 điểm ngang).
