@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"go-printer/internal/constants"
@@ -9,7 +10,9 @@ import (
 	"log"
 	"mime/multipart"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -109,32 +112,23 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 	return nil
 }
 
-func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string, file *multipart.FileHeader) error {
-
-	// lấy print từ file json
-	data, err := os.ReadFile("./config/config.json")
-	if err != nil {
-		return err
-	}
-
-	var config []response.PrintConfigResponse
-	if err := json.Unmarshal(data, &config); err != nil {
-		return err
-	}
-
+func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, file *multipart.FileHeader) error {
 	// lấy những printer theo type
-	printers := []string{}
-	for _, c := range config {
-		for _, t := range c.Type {
-			if t == printType {
-				printers = append(printers, c.PrinterName)
-			}
-		}
-	}
-
-	if len(printers) == 0 {
+	cmd := exec.Command(
+		"powershell",
+		fmt.Sprintf(
+			`(Get-PrinterPort -Name (Get-Printer -Name "%s").PortName).PrinterHostAddress`,
+			printer,
+		),
+	)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
 		return fmt.Errorf(constants.PRINT_NOT_FOUND)
 	}
+
+	ip := strings.TrimSpace(out.String())
 
 	// save file tạm thời
 	now := time.Now()
@@ -144,7 +138,6 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	}
 
 	// send file to telegram bot
-	utils.SendFileToTelegramBot(tempFilePath)
 
 	f, err := file.Open()
 	if err != nil {
@@ -156,22 +149,16 @@ func (ps *PrintService) JobPrint(c *gin.Context, printType string, copies string
 	var errFinal error
 
 	// ping printer
-	for _, printer := range printers {
-		conn, err := utils.ConnectPrinter(printer)
-		if err != nil {
-			log.Println("ping printer error: ", err)
-			errFinal = err
-			break
-		}
-		conn.Close()
+	_, err = utils.ConnectPrinter(ip)
+	if err != nil {
+		log.Println("ping printer error: ", err)
+		errFinal = err
 	}
 
 	// gửi in cho từng printer
-	for _, printer := range printers {
-		if err := utils.PrintFileQueued(printer, tempFilePath, copies); err != nil {
-			log.Println("print file error: ", err)
-			return err
-		}
+	if err := utils.PrintFileQueued(ip, tempFilePath, copies); err != nil {
+		log.Println("print file error: ", err)
+		return err
 	}
 
 	if errFinal != nil {

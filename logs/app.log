@@ -24,3 +24,418 @@
 2025/12/15 23:51:55 print.go:49: Retry 4 after error: connect_timeout, sleeping 30s
 2025/12/15 23:52:06 app.go:121: hour:  23
 2025/12/15 23:52:06 app.go:123: Not time for cleanup yet.
+2026/01/26 17:20:41 app.go:100: Folders and logger initialized.
+2026/01/26 17:20:41 app.go:163: Server starting on :9099
+2026/01/26 17:20:41 app.go:121: hour:  17
+2026/01/26 17:20:41 app.go:123: Not time for cleanup yet.
+2026/01/26 17:21:41 app.go:121: hour:  17
+2026/01/26 17:21:41 app.go:123: Not time for cleanup yet.
+2026/01/26 17:22:41 app.go:121: hour:  17
+2026/01/26 17:22:41 app.go:123: Not time for cleanup yet.
+2026/01/26 17:22:58 app.go:100: Folders and logger initialized.
+2026/01/26 17:22:58 app.go:163: Server starting on :9099
+2026/01/26 17:22:58 app.go:121: hour:  17
+2026/01/26 17:22:58 app.go:123: Not time for cleanup yet.
+2026/01/26 17:23:10 print.go:92: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:23:10 print.go:92: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:23:10 print.go:92: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:23:10 print.go:92: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:23:10 print.go:92: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:23:58 app.go:121: hour:  17
+2026/01/26 17:23:58 app.go:123: Not time for cleanup yet.
+2026/01/26 17:24:58 app.go:121: hour:  17
+2026/01/26 17:24:58 app.go:123: Not time for cleanup yet.
+2026/01/26 17:25:58 app.go:121: hour:  17
+2026/01/26 17:25:58 app.go:123: Not time for cleanup yet.
+2026/01/26 17:26:11 app.go:100: Folders and logger initialized.
+2026/01/26 17:26:11 app.go:163: Server starting on :9099
+2026/01/26 17:26:11 app.go:121: hour:  17
+2026/01/26 17:26:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:27:11 app.go:121: hour:  17
+2026/01/26 17:27:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:28:11 app.go:121: hour:  17
+2026/01/26 17:28:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:28:16 print.go:91: ------ 2929-----
+2026/01/26 17:28:16 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:28:16 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:28:16 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:28:16 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:28:16 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:29:11 app.go:121: hour:  17
+2026/01/26 17:29:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:30:11 app.go:121: hour:  17
+2026/01/26 17:30:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:31:11 app.go:121: hour:  17
+2026/01/26 17:31:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:32:11 app.go:121: hour:  17
+2026/01/26 17:32:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:33:11 app.go:121: hour:  17
+2026/01/26 17:33:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:34:11 app.go:121: hour:  17
+2026/01/26 17:34:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:35:11 app.go:121: hour:  17
+2026/01/26 17:35:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:36:11 app.go:121: hour:  17
+2026/01/26 17:36:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:36:45 print.go:91: ------ 2929-----
+2026/01/26 17:36:45 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:36:45 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:36:45 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:36:45 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:36:45 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:37:11 app.go:121: hour:  17
+2026/01/26 17:37:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:38:11 app.go:121: hour:  17
+2026/01/26 17:38:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:39:11 app.go:121: hour:  17
+2026/01/26 17:39:11 app.go:123: Not time for cleanup yet.
+2026/01/26 17:39:24 app.go:100: Folders and logger initialized.
+2026/01/26 17:39:24 app.go:163: Server starting on :9099
+2026/01/26 17:39:24 app.go:121: hour:  17
+2026/01/26 17:39:24 app.go:123: Not time for cleanup yet.
+2026/01/26 17:39:37 print.go:91: ------ 2929-----
+2026/01/26 17:39:37 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:39:37 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:39:37 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:39:37 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:39:37 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:40:14 app.go:100: Folders and logger initialized.
+2026/01/26 17:40:14 app.go:163: Server starting on :9099
+2026/01/26 17:40:14 app.go:121: hour:  17
+2026/01/26 17:40:14 app.go:123: Not time for cleanup yet.
+2026/01/26 17:40:18 print.go:25: test
+2026/01/26 17:40:19 print.go:91: ------ 2929-----
+2026/01/26 17:40:19 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:40:19 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:40:19 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:40:19 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:40:19 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:41:00 print.go:25: test
+2026/01/26 17:41:01 print.go:91: ------ 2929-----
+2026/01/26 17:41:01 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:41:01 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:01 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:01 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:41:01 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:41:02 print.go:25: test
+2026/01/26 17:41:03 print.go:91: ------ 2929-----
+2026/01/26 17:41:03 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:41:03 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:03 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:03 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:41:03 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:41:03 print.go:25: test
+2026/01/26 17:41:04 print.go:91: ------ 2929-----
+2026/01/26 17:41:04 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:41:04 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:04 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:04 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:41:04 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:41:14 app.go:121: hour:  17
+2026/01/26 17:41:14 app.go:123: Not time for cleanup yet.
+2026/01/26 17:41:23 app.go:100: Folders and logger initialized.
+2026/01/26 17:41:23 app.go:163: Server starting on :9099
+2026/01/26 17:41:23 app.go:121: hour:  17
+2026/01/26 17:41:23 app.go:123: Not time for cleanup yet.
+2026/01/26 17:41:46 app.go:100: Folders and logger initialized.
+2026/01/26 17:41:46 app.go:163: Server starting on :9099
+2026/01/26 17:41:46 app.go:121: hour:  17
+2026/01/26 17:41:46 app.go:123: Not time for cleanup yet.
+2026/01/26 17:41:49 print.go:25: test
+2026/01/26 17:41:50 print.go:91: ------ 2929-----
+2026/01/26 17:41:50 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:41:50 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:50 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:41:50 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:41:50 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:42:12 app.go:100: Folders and logger initialized.
+2026/01/26 17:42:12 app.go:163: Server starting on :9099
+2026/01/26 17:42:12 app.go:121: hour:  17
+2026/01/26 17:42:12 app.go:123: Not time for cleanup yet.
+2026/01/26 17:42:25 print.go:25: test
+2026/01/26 17:42:59 app.go:100: Folders and logger initialized.
+2026/01/26 17:42:59 app.go:163: Server starting on :9099
+2026/01/26 17:42:59 app.go:121: hour:  17
+2026/01/26 17:42:59 app.go:123: Not time for cleanup yet.
+2026/01/26 17:43:08 print.go:91: ------ 2929-----
+2026/01/26 17:43:08 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:43:08 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:43:08 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:43:08 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:43:08 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:43:45 app.go:100: Folders and logger initialized.
+2026/01/26 17:43:45 app.go:163: Server starting on :9099
+2026/01/26 17:43:45 app.go:121: hour:  17
+2026/01/26 17:43:45 app.go:123: Not time for cleanup yet.
+2026/01/26 17:43:51 print.go:91: ------ 2929-----
+2026/01/26 17:43:51 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:43:51 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:43:51 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:43:51 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:43:51 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:44:33 print.go:91: ------ 2929-----
+2026/01/26 17:44:33 print.go:93: line:  80mm Series Printer                            Local        80mm Series Printer       192.168.1.114   False    False      Print          
+2026/01/26 17:44:33 print.go:93: line:  Microsoft XPS Document Writer                  Local        Microsoft XPS Document... PORTPROMPT:     False    False      Print          
+2026/01/26 17:44:33 print.go:93: line:  Microsoft Print to PDF                         Local        Microsoft Print To PDF    PORTPROMPT:     False    False      Print          
+2026/01/26 17:44:33 print.go:93: line:  iTP86                                          Local        iTP86                     192.168.1.100   False    False      Print          
+2026/01/26 17:44:33 print.go:93: line:  Fax                                            Local        Microsoft Shared Fax D... SHRFAX:         False    False      Print
+2026/01/26 17:44:45 app.go:121: hour:  17
+2026/01/26 17:44:45 app.go:123: Not time for cleanup yet.
+2026/01/26 17:45:01 app.go:100: Folders and logger initialized.
+2026/01/26 17:45:01 app.go:163: Server starting on :9099
+2026/01/26 17:45:01 app.go:121: hour:  17
+2026/01/26 17:45:01 app.go:123: Not time for cleanup yet.
+2026/01/26 17:46:01 app.go:121: hour:  17
+2026/01/26 17:46:01 app.go:123: Not time for cleanup yet.
+2026/02/09 12:40:36 app.go:100: Folders and logger initialized.
+2026/02/09 12:40:36 app.go:163: Server starting on :9099
+2026/02/09 12:40:36 app.go:121: hour:  12
+2026/02/09 12:40:36 app.go:123: Not time for cleanup yet.
+2026/02/09 12:41:20 app.go:100: Folders and logger initialized.
+2026/02/09 12:41:20 app.go:163: Server starting on :9099
+2026/02/09 12:41:20 app.go:121: hour:  12
+2026/02/09 12:41:20 app.go:123: Not time for cleanup yet.
+2026/02/09 12:41:27 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:41:27 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:41:28 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:41:28 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:41:30 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:41:30 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:42:11 app.go:100: Folders and logger initialized.
+2026/02/09 12:42:11 app.go:163: Server starting on :9099
+2026/02/09 12:42:11 app.go:121: hour:  12
+2026/02/09 12:42:11 app.go:123: Not time for cleanup yet.
+2026/02/09 12:42:24 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:42:24 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:42:24 print.go:26: printers:  []
+2026/02/09 12:42:25 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:42:25 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:42:25 print.go:26: printers:  []
+2026/02/09 12:42:26 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:42:26 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:42:26 print.go:26: printers:  []
+2026/02/09 12:42:27 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:42:27 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:42:27 print.go:26: printers:  []
+2026/02/09 12:43:00 app.go:100: Folders and logger initialized.
+2026/02/09 12:43:00 app.go:163: Server starting on :9099
+2026/02/09 12:43:00 app.go:121: hour:  12
+2026/02/09 12:43:00 app.go:123: Not time for cleanup yet.
+2026/02/09 12:43:06 print.go:25: test
+2026/02/09 12:43:07 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:43:07 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:43:07 print.go:27: printers:  []
+2026/02/09 12:43:09 print.go:25: test
+2026/02/09 12:43:09 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:43:09 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:43:09 print.go:27: printers:  []
+2026/02/09 12:43:11 print.go:25: test
+2026/02/09 12:43:12 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:43:12 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:43:12 print.go:27: printers:  []
+2026/02/09 12:43:13 print.go:25: test
+2026/02/09 12:43:13 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:43:13 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:43:13 print.go:27: printers:  []
+2026/02/09 12:44:17 app.go:100: Folders and logger initialized.
+2026/02/09 12:44:17 app.go:163: Server starting on :9099
+2026/02/09 12:44:17 app.go:121: hour:  12
+2026/02/09 12:44:17 app.go:123: Not time for cleanup yet.
+2026/02/09 12:44:24 print.go:25: test
+2026/02/09 12:44:25 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:44:25 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:44:25 print.go:27: printers:  []
+2026/02/09 12:44:26 print.go:25: test
+2026/02/09 12:44:26 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:44:26 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:44:26 print.go:27: printers:  []
+2026/02/09 12:44:27 print.go:25: test
+2026/02/09 12:44:28 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:44:28 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:44:28 print.go:27: printers:  []
+2026/02/09 12:45:05 response.go:25: error message:  Printer config not found
+2026/02/09 12:45:06 response.go:25: error message:  Printer config not found
+2026/02/09 12:45:06 response.go:25: error message:  Printer config not found
+2026/02/09 12:45:07 response.go:25: error message:  Printer config not found
+2026/02/09 12:45:10 print.go:25: test
+2026/02/09 12:45:11 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:45:11 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:45:11 print.go:27: printers:  []
+2026/02/09 12:45:42 app.go:100: Folders and logger initialized.
+2026/02/09 12:45:42 app.go:163: Server starting on :9099
+2026/02/09 12:45:42 app.go:121: hour:  12
+2026/02/09 12:45:42 app.go:123: Not time for cleanup yet.
+2026/02/09 12:46:03 print.go:25: test
+2026/02/09 12:46:03 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:46:03 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:46:03 print.go:27: printers:  []
+2026/02/09 12:46:25 app.go:100: Folders and logger initialized.
+2026/02/09 12:46:25 app.go:163: Server starting on :9099
+2026/02/09 12:46:25 app.go:121: hour:  12
+2026/02/09 12:46:25 app.go:123: Not time for cleanup yet.
+2026/02/09 12:48:17 app.go:100: Folders and logger initialized.
+2026/02/09 12:48:17 app.go:163: Server starting on :9099
+2026/02/09 12:48:17 app.go:121: hour:  12
+2026/02/09 12:48:17 app.go:123: Not time for cleanup yet.
+2026/02/09 12:48:28 print.go:25: test
+2026/02/09 12:48:28 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:48:28 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:48:28 print.go:27: printers:  []
+2026/02/09 12:48:30 print.go:25: test
+2026/02/09 12:48:30 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:48:30 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:48:30 print.go:27: printers:  []
+2026/02/09 12:48:31 print.go:25: test
+2026/02/09 12:48:32 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:48:32 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:48:32 print.go:27: printers:  []
+2026/02/09 12:49:18 app.go:100: Folders and logger initialized.
+2026/02/09 12:49:18 app.go:163: Server starting on :9099
+2026/02/09 12:49:18 app.go:121: hour:  12
+2026/02/09 12:49:18 app.go:123: Not time for cleanup yet.
+2026/02/09 12:49:26 print.go:26: test
+2026/02/09 12:49:26 print.go:96: line:  LBP6230dn                                      Local        Canon LBP6230/6240 V4     WSD-5353ab0d... False    False      Print          
+2026/02/09 12:49:26 print.go:96: line:  80mm Series Printer                            Local        80mm Series Printer       Printer1        False    False      Print
+2026/02/09 12:49:57 app.go:100: Folders and logger initialized.
+2026/02/09 12:49:57 app.go:163: Server starting on :9099
+2026/02/09 12:49:57 app.go:121: hour:  12
+2026/02/09 12:49:57 app.go:123: Not time for cleanup yet.
+2026/02/09 12:50:05 print.go:26: test
+2026/02/09 12:50:36 app.go:100: Folders and logger initialized.
+2026/02/09 12:50:36 app.go:163: Server starting on :9099
+2026/02/09 12:50:36 app.go:121: hour:  12
+2026/02/09 12:50:36 app.go:123: Not time for cleanup yet.
+2026/02/09 12:50:41 print.go:26: test
+2026/02/09 12:50:42 print.go:26: test
+2026/02/09 12:50:44 print.go:26: test
+2026/02/09 12:52:20 app.go:100: Folders and logger initialized.
+2026/02/09 12:52:20 app.go:163: Server starting on :9099
+2026/02/09 12:52:20 app.go:121: hour:  12
+2026/02/09 12:52:20 app.go:123: Not time for cleanup yet.
+2026/02/09 12:52:27 print.go:26: test
+2026/02/09 12:52:37 print.go:26: test
+2026/02/09 12:53:25 print.go:26: test
+2026/02/09 12:53:56 app.go:100: Folders and logger initialized.
+2026/02/09 12:53:56 app.go:163: Server starting on :9099
+2026/02/09 12:53:56 app.go:121: hour:  12
+2026/02/09 12:53:56 app.go:123: Not time for cleanup yet.
+2026/02/09 12:54:02 print.go:26: test
+2026/02/09 12:54:32 app.go:100: Folders and logger initialized.
+2026/02/09 12:54:32 app.go:163: Server starting on :9099
+2026/02/09 12:54:32 app.go:121: hour:  12
+2026/02/09 12:54:32 app.go:123: Not time for cleanup yet.
+2026/02/09 12:54:38 print.go:26: test
+2026/02/09 12:55:00 app.go:100: Folders and logger initialized.
+2026/02/09 12:55:00 app.go:163: Server starting on :9099
+2026/02/09 12:55:00 app.go:121: hour:  12
+2026/02/09 12:55:00 app.go:123: Not time for cleanup yet.
+2026/02/09 12:55:12 print.go:26: test
+2026/02/24 09:06:16 app.go:100: Folders and logger initialized.
+2026/02/24 09:06:16 app.go:163: Server starting on :9099
+2026/02/24 09:06:16 app.go:121: hour:  9
+2026/02/24 09:06:16 app.go:123: Not time for cleanup yet.
+2026/02/24 09:07:43 app.go:100: Folders and logger initialized.
+2026/02/24 09:07:43 app.go:163: Server starting on :9099
+2026/02/24 09:07:43 app.go:121: hour:  9
+2026/02/24 09:07:43 app.go:123: Not time for cleanup yet.
+2026/02/24 09:09:50 app.go:100: Folders and logger initialized.
+2026/02/24 09:09:50 app.go:163: Server starting on :9099
+2026/02/24 09:09:50 app.go:121: hour:  9
+2026/02/24 09:09:50 app.go:123: Not time for cleanup yet.
+2026/02/24 09:10:03 app.go:100: Folders and logger initialized.
+2026/02/24 09:10:03 app.go:163: Server starting on :9099
+2026/02/24 09:10:03 app.go:121: hour:  9
+2026/02/24 09:10:03 app.go:123: Not time for cleanup yet.
+2026/02/24 09:10:57 app.go:100: Folders and logger initialized.
+2026/02/24 09:10:57 app.go:163: Server starting on :9099
+2026/02/24 09:10:57 app.go:121: hour:  9
+2026/02/24 09:10:57 app.go:123: Not time for cleanup yet.
+2026/02/24 09:13:14 app.go:100: Folders and logger initialized.
+2026/02/24 09:13:14 app.go:163: Server starting on :9099
+2026/02/24 09:13:14 app.go:121: hour:  9
+2026/02/24 09:13:14 app.go:123: Not time for cleanup yet.
+2026/02/24 09:14:11 app.go:100: Folders and logger initialized.
+2026/02/24 09:14:11 app.go:163: Server starting on :9099
+2026/02/24 09:14:11 app.go:121: hour:  9
+2026/02/24 09:14:11 app.go:123: Not time for cleanup yet.
+2026/02/24 09:15:07 app.go:100: Folders and logger initialized.
+2026/02/24 09:15:07 app.go:163: Server starting on :9099
+2026/02/24 09:15:07 app.go:121: hour:  9
+2026/02/24 09:15:07 app.go:123: Not time for cleanup yet.
+2026/02/24 09:17:50 app.go:100: Folders and logger initialized.
+2026/02/24 09:17:50 app.go:163: Server starting on :9099
+2026/02/24 09:17:50 app.go:121: hour:  9
+2026/02/24 09:17:50 app.go:123: Not time for cleanup yet.
+2026/02/24 09:18:22 app.go:100: Folders and logger initialized.
+2026/02/24 09:18:22 app.go:163: Server starting on :9099
+2026/02/24 09:18:22 app.go:121: hour:  9
+2026/02/24 09:18:22 app.go:123: Not time for cleanup yet.
+2026/02/24 09:20:11 app.go:100: Folders and logger initialized.
+2026/02/24 09:20:11 app.go:163: Server starting on :9099
+2026/02/24 09:20:11 app.go:121: hour:  9
+2026/02/24 09:20:11 app.go:123: Not time for cleanup yet.
+2026/02/24 09:21:46 app.go:100: Folders and logger initialized.
+2026/02/24 09:21:46 app.go:163: Server starting on :9099
+2026/02/24 09:21:46 app.go:121: hour:  9
+2026/02/24 09:21:46 app.go:123: Not time for cleanup yet.
+2026/02/24 09:22:40 app.go:100: Folders and logger initialized.
+2026/02/24 09:22:40 app.go:163: Server starting on :9099
+2026/02/24 09:22:40 app.go:121: hour:  9
+2026/02/24 09:22:40 app.go:123: Not time for cleanup yet.
+2026/02/24 09:31:40 app.go:100: Folders and logger initialized.
+2026/02/24 09:31:40 app.go:163: Server starting on :9099
+2026/02/24 09:31:40 app.go:121: hour:  9
+2026/02/24 09:31:40 app.go:123: Not time for cleanup yet.
+2026/02/24 09:32:48 app.go:100: Folders and logger initialized.
+2026/02/24 09:32:48 app.go:163: Server starting on :9099
+2026/02/24 09:32:48 app.go:121: hour:  9
+2026/02/24 09:32:48 app.go:123: Not time for cleanup yet.
+2026/02/24 10:32:48 app.go:121: hour:  10
+2026/02/24 10:32:48 app.go:123: Not time for cleanup yet.
+2026/02/24 10:53:13 app.go:100: Folders and logger initialized.
+2026/02/24 10:53:13 app.go:163: Server starting on :9099
+2026/02/24 10:53:13 app.go:121: hour:  10
+2026/02/24 10:53:13 app.go:123: Not time for cleanup yet.
+2026/02/24 10:54:42 app.go:100: Folders and logger initialized.
+2026/02/24 10:54:42 app.go:163: Server starting on :9099
+2026/02/24 10:54:42 app.go:121: hour:  10
+2026/02/24 10:54:42 app.go:123: Not time for cleanup yet.
+2026/02/24 10:57:15 app.go:100: Folders and logger initialized.
+2026/02/24 10:57:15 app.go:163: Server starting on :9099
+2026/02/24 10:57:15 app.go:121: hour:  10
+2026/02/24 10:57:15 app.go:123: Not time for cleanup yet.
+2026/02/24 10:57:57 app.go:100: Folders and logger initialized.
+2026/02/24 10:57:57 app.go:163: Server starting on :9099
+2026/02/24 10:57:57 app.go:121: hour:  10
+2026/02/24 10:57:57 app.go:123: Not time for cleanup yet.
+2026/02/24 11:02:40 app.go:100: Folders and logger initialized.
+2026/02/24 11:02:40 app.go:163: Server starting on :9099
+2026/02/24 11:02:40 app.go:121: hour:  11
+2026/02/24 11:02:40 app.go:123: Not time for cleanup yet.
+2026/02/24 11:03:34 app.go:100: Folders and logger initialized.
+2026/02/24 11:03:34 app.go:163: Server starting on :9099
+2026/02/24 11:03:34 app.go:121: hour:  11
+2026/02/24 11:03:34 app.go:123: Not time for cleanup yet.
+2026/02/24 11:04:17 app.go:100: Folders and logger initialized.
+2026/02/24 11:04:17 app.go:163: Server starting on :9099
+2026/02/24 11:04:17 app.go:121: hour:  11
+2026/02/24 11:04:17 app.go:123: Not time for cleanup yet.
+2026/02/24 11:13:39 app.go:100: Folders and logger initialized.
+2026/02/24 11:13:39 app.go:163: Server starting on :9099
+2026/02/24 11:13:39 app.go:121: hour:  11
+2026/02/24 11:13:39 app.go:123: Not time for cleanup yet.
+2026/02/24 11:14:33 print.go:78: copies:  1
+2026/02/24 11:14:34 print.go:263: lỗi kết nối máy in:  dial tcp: lookup 80mm Series Printer: no such host
+2026/02/24 11:14:34 print.go:154: ping printer error:  connect_timeout
+2026/02/24 11:14:34 response.go:25: error message:  connect_timeout
+2026/02/24 11:14:34 print.go:286: Trạng thái máy in: 0x00
+2026/02/24 11:18:45 app.go:100: Folders and logger initialized.
+2026/02/24 11:18:45 app.go:163: Server starting on :9099
+2026/02/24 11:18:45 app.go:121: hour:  11
+2026/02/24 11:18:45 app.go:123: Not time for cleanup yet.
+2026/02/24 11:19:00 print.go:78: copies:  1
+2026/02/24 11:19:01 print.go:168: print done
+2026/02/24 11:20:20 app.go:100: Folders and logger initialized.
+2026/02/24 11:20:20 app.go:163: Server starting on :9099
+2026/02/24 11:20:20 app.go:121: hour:  11
+2026/02/24 11:20:20 app.go:123: Not time for cleanup yet.

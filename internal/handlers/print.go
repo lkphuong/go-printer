@@ -73,7 +73,7 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	}
 
 	files := form.File["file"]
-	printType := form.Value["type"]
+	printer := form.Value["printer"]
 	copies := form.Value["copies"]
 	log.Println("copies: ", len(copies))
 	if len(copies) == 0 {
@@ -85,7 +85,7 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 		return
 	}
 
-	if err := ph.printService.JobPrint(c, printType[0], copies[0], files[0]); err != nil {
+	if err := ph.printService.JobPrint(c, printer[0], copies[0], files[0]); err != nil {
 		utils.ResponseError(c, http.StatusBadRequest, err.Error(), err.Error())
 		return
 	}

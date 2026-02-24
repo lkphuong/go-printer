@@ -10,14 +10,13 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
 )
 
 type PrintRequest struct {
-	Printer    string
+	IP         string
 	FilePath   string
 	Copies     string
 	Result     chan error
@@ -34,7 +33,7 @@ func startPrintWorker() {
 			go func(r PrintRequest) {
 				var err error
 				for {
-					err = printFile(r.Printer, r.FilePath, r.Copies)
+					err = printFile(r.IP, r.FilePath, r.Copies)
 					if err == nil {
 						break
 					}
@@ -60,9 +59,9 @@ func init() {
 	startPrintWorker()
 }
 
-func PrintFileQueued(printer string, filePath string, copies string) error {
+func PrintFileQueued(ip string, filePath string, copies string) error {
 	req := PrintRequest{
-		Printer:    printer,
+		IP:         ip,
 		FilePath:   filePath,
 		Copies:     copies,
 		Result:     make(chan error, 1),
@@ -80,7 +79,7 @@ func PrintFileQueued(printer string, filePath string, copies string) error {
 func GetPrinters() ([]string, error) {
 	switch runtime.GOOS {
 	case "windows":
-		cmd := exec.Command("powershell", "Get-Printer")
+		cmd := exec.Command("powershell", " Get-Printer | Select Name")
 		var out bytes.Buffer
 		cmd.Stdout = &out
 		err := cmd.Run()
@@ -90,20 +89,17 @@ func GetPrinters() ([]string, error) {
 		// return array of printer names:portName
 		lines := []string{}
 
-		rexIp := regexp.MustCompile(`\b(?:\d{1,3}\.){3}\d{1,3}\b`)
+		if len(strings.Split(strings.TrimSpace(out.String()), "\n")) < 1 {
+			return lines, nil
+		}
 
 		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n")[2:] {
-
-			ip := rexIp.FindString(line)
-			if ip == "" {
-				continue
-			}
-
 			// tên máy in trước chữ local
 			printerName := strings.TrimSpace(strings.Split(line, "Local")[0])
 
-			lines = append(lines, fmt.Sprintf("%s|%s:9100", printerName, ip))
+			fmt.Println("name: ", printerName)
 
+			lines = append(lines, printerName)
 		}
 
 		return lines, nil // iTP86|192.168.1.100:9100
@@ -130,7 +126,7 @@ func GetPrinters() ([]string, error) {
 	}
 }
 
-func printFile(printer string, filePath string, copies string) error {
+func printFile(ip string, filePath string, copies string) error {
 
 	numCopies := 1
 	if copies != "" {
@@ -140,7 +136,7 @@ func printFile(printer string, filePath string, copies string) error {
 	}
 
 	// printer|192.168.1.100:9100
-	printerConn, err := ConnectPrinter(printer)
+	printerConn, err := ConnectPrinter(ip)
 	if err != nil {
 		return err
 	}
@@ -258,13 +254,9 @@ func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
 	return command, nil
 }
 
-func ConnectPrinter(printer string) (net.Conn, error) {
-	// printer|ip:port
-	parts := strings.Split(printer, "|")
-	if len(parts) != 2 {
-		return nil, fmt.Errorf(constants.PRINT_NOT_FOUND)
-	}
-	address := parts[1]
+func ConnectPrinter(ip string) (net.Conn, error) {
+
+	address := fmt.Sprintf("%s:%d", ip, 9100)
 
 	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
 	if err != nil {
