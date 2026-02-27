@@ -71,10 +71,7 @@ All endpoints are prefixed with `/api/v1`.
 ### Printers
 
 - `GET /printers` - Get list of available printers
-- `GET /printers/:printer/config` - Get print configuration for a specific printer
-- `POST /printers/config` - Configure a printer
 - `POST /printers/jobs` - Submit a print job
-- `DELETE /printers/cache` - Clear print cache
 
 ### Example API Usage
 
@@ -82,18 +79,11 @@ All endpoints are prefixed with `/api/v1`.
 # Get printers
 curl http://localhost:9099/api/v1/printers
 
-# Get config for a printer
-curl http://localhost:9099/api/v1/printers/MyPrinter/config
-
 # Submit a print job (example payload)
 curl -X POST http://localhost:9099/api/v1/printers/jobs \
   -H "Content-Type: application/json" \
   -d '{"printer": "MyPrinter", "file": "path/to/file.pdf"}'
 ```
-
-## Configuration
-
-The application uses `config/config.json` for storing printer configurations. The file is automatically created if it doesn't exist.
 
 ## Project Structure
 
