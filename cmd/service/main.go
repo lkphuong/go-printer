@@ -108,25 +108,22 @@ func getServiceStatus() string {
 	return strings.TrimSpace(output)
 }
 
-func printHelp() {
-	fmt.Println("Usage:")
-	fmt.Println("  printer-service.exe [command]")
+func printBanner() {
 	fmt.Println("")
-	fmt.Println("Commands:")
-	fmt.Println("  (no args)     - Create and start service (interactive)")
-	fmt.Println("  -install      - Create service")
-	fmt.Println("  -start        - Start service")
-	fmt.Println("  -stop         - Stop service")
-	fmt.Println("  -remove       - Remove service")
-	fmt.Println("  -status       - Check service status")
-	fmt.Println("  -help         - Show this help")
+	fmt.Println("╔═══════════════════════════════════════════╗")
+	fmt.Println("║   Go Printer - Windows Service Setup      ║")
+	fmt.Println("╚═══════════════════════════════════════════╝")
 	fmt.Println("")
 }
 
 func main() {
+	printBanner()
+
 	// Check if running on Windows
 	if runtime.GOOS != "windows" {
 		fmt.Println("Error: This tool only works on Windows")
+		fmt.Print("Press Enter to exit...")
+		fmt.Scanln()
 		os.Exit(1)
 	}
 
@@ -143,9 +140,10 @@ func main() {
 
 	if !isAdmin {
 		fmt.Println("Requires Administrator privileges")
+		fmt.Println("")
 		fmt.Println("Please run this program as Administrator:")
-		fmt.Println("  1. Right-click on printer-service.exe")
-		fmt.Println("  2. Select 'Run as administrator'")
+		fmt.Println("  Right-click on printer-service.exe")
+		fmt.Println("  Select 'Run as administrator'")
 		fmt.Println("")
 		fmt.Print("Press Enter to exit...")
 		fmt.Scanln()
@@ -155,147 +153,81 @@ func main() {
 	exePath, err := os.Executable()
 	if err != nil {
 		fmt.Println("Error getting executable path:", err)
+		fmt.Print("Press Enter to exit...")
+		fmt.Scanln()
 		os.Exit(1)
 	}
 
 	exeDir := filepath.Dir(exePath)
 
-	// Parse command line arguments
+	// Parse command line arguments (optional)
 	if len(os.Args) > 1 {
 		cmd := strings.ToLower(os.Args[1])
-
 		switch cmd {
-		case "-install":
-			fmt.Println("Installing service...")
-			if err := createAndStartService(exePath); err != nil {
-				fmt.Printf("Error: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Println("✓ Service installed and started")
-
 		case "-start":
 			if err := startService(); err != nil {
 				fmt.Printf("Error: %v\n", err)
 				os.Exit(1)
 			}
+			fmt.Println("✓ Service started")
+			return
 
 		case "-stop":
 			if err := stopService(); err != nil {
 				fmt.Printf("Error: %v\n", err)
 				os.Exit(1)
 			}
-
-		case "-remove":
-			if err := removeService(); err != nil {
-				fmt.Printf("Error: %v\n", err)
-				os.Exit(1)
-			}
+			fmt.Println("✓ Service stopped")
+			return
 
 		case "-status":
 			status := getServiceStatus()
 			fmt.Printf("Service status: %s\n", status)
+			return
 
 		case "-help", "-h", "-?":
-			printHelp()
-
-		default:
-			fmt.Printf("Unknown command: %s\n", cmd)
-			printHelp()
-			os.Exit(1)
+			fmt.Println("Usage: printer-service.exe [command]")
+			fmt.Println("Commands: -start, -stop, -status, -help")
+			return
 		}
-		return
 	}
 
-	// No arguments - interactive mode
-
-	// Check if service exists
+	// ===== DEFAULT: Auto-setup/replace mode (double-click) =====
+	fmt.Println("Checking for existing service...")
 	exists, err := isServiceExists()
 	if err != nil {
-		fmt.Printf("Error checking service: %v\n", err)
-		os.Exit(1)
+		fmt.Printf("⚠ Warning: Could not check existing service: %v\n", err)
+		exists = false
 	}
 
 	if exists {
-		status := getServiceStatus()
-		fmt.Printf("Service already exists (Status: %s)\n", status)
+		fmt.Println("✓ Service already exists")
 		fmt.Println("")
-		fmt.Println("Choose action:")
-		fmt.Println("  1. Start service")
-		fmt.Println("  2. Stop service")
-		fmt.Println("  3. Reinstall service")
-		fmt.Println("  4. Remove service")
-		fmt.Println("  5. Exit")
-		fmt.Print("\nEnter choice (1-5): ")
-
-		var choice string
-		fmt.Scanln(&choice)
-
-		switch choice {
-		case "1":
-			fmt.Println("\nStarting service...")
-			if err := startService(); err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else {
-				fmt.Println("✓ Service started")
-			}
-
-		case "2":
-			fmt.Println("\nStopping service...")
-			if err := stopService(); err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else {
-				fmt.Println("✓ Service stopped")
-			}
-
-		case "3":
-			fmt.Println("\nReinstalling service...")
-			if err := removeService(); err != nil {
-				fmt.Printf("Error: %v\n", err)
-				time.Sleep(2 * time.Second)
-			}
-			fmt.Println("\nCreating new service...")
-			if err := createAndStartService(exePath); err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else {
-				fmt.Println("✓ Service reinstalled and started")
-			}
-
-		case "4":
-			fmt.Println("\nRemoving service...")
-			if err := removeService(); err != nil {
-				fmt.Printf("Error: %v\n", err)
-			} else {
-				fmt.Println("✓ Service removed")
-			}
-
-		case "5":
-			fmt.Println("Exiting...")
-			return
-
-		default:
-			fmt.Println("Invalid choice")
+		fmt.Println("Removing old service...")
+		if err := removeService(); err != nil {
+			fmt.Printf("⚠ Warning: %v\n", err)
 		}
-	} else {
-		// Service doesn't exist, create and start it
-		fmt.Println("Service not found. Creating...")
-		fmt.Printf("Executable: %s\n", exePath)
-		fmt.Printf("Working directory: %s\n", exeDir)
-		fmt.Println("")
-
-		if err := createAndStartService(exePath); err != nil {
-			fmt.Printf("Error: %v\n", err)
-			fmt.Print("\nPress Enter to exit...")
-			fmt.Scanln()
-			os.Exit(1)
-		}
-
-		fmt.Println("")
-		fmt.Println("Setup Complete!")
-		fmt.Println("")
-		fmt.Printf("Access API at: http://localhost:9099\n")
-		fmt.Printf("Logs at: %s\\logs\\app.log\n", exeDir)
-		fmt.Println("")
-		fmt.Println("The window will close in 5 seconds...")
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
+
+	fmt.Println("Installing service...")
+	fmt.Printf("Path: %s\n", exePath)
+	fmt.Println("")
+
+	if err := createAndStartService(exePath); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		fmt.Print("Press Enter to exit...")
+		fmt.Scanln()
+		os.Exit(1)
+	}
+
+	fmt.Println("")
+	fmt.Println("Setup Complete!")
+	fmt.Println("")
+	fmt.Printf("✓ Service installed and started\n")
+	fmt.Printf("✓ Access API: http://localhost:9099\n")
+	fmt.Printf("✓ Logs: %s\\logs\\app.log\n", exeDir)
+	fmt.Println("")
+	fmt.Println("Closing in 4 seconds...")
+	time.Sleep(4 * time.Second)
 }
