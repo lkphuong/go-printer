@@ -3,35 +3,19 @@
 set SERVICE_NAME=PrinterAMD64
 set EXE_PATH=%~dp0printer-amd64.exe
 
-echo EXE PATH: %EXE_PATH%
+echo Installing service...
 
-if not exist "%EXE_PATH%" (
-    echo ERROR: printer-amd64.exe not found
-    pause
-    exit
-)
+sc stop %SERVICE_NAME% >nul 2>&1
+sc delete %SERVICE_NAME% >nul 2>&1
 
-echo Checking service...
-
-sc query %SERVICE_NAME% >nul 2>&1
-if %errorlevel%==0 (
-    echo Service exists. Stopping...
-
-    sc stop %SERVICE_NAME% >nul 2>&1
-    timeout /t 2 /nobreak >nul
-
-    echo Deleting old service...
-    sc delete %SERVICE_NAME% >nul 2>&1
-    timeout /t 2 /nobreak >nul
-)
-
-echo Creating new service...
+timeout /t 2 >nul
 
 sc create %SERVICE_NAME% binPath= "%EXE_PATH%" start= auto
+
+sc qc %SERVICE_NAME%
 
 echo Starting service...
 
 sc start %SERVICE_NAME%
 
-echo Done.
 pause
