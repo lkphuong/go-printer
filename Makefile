@@ -4,9 +4,6 @@ run:
 build-windows:
 	GOOS=windows GOARCH=amd64 go build -o build/printer-amd64.exe ./cmd/server/main.go
 
-build-windows-service:
-	GOOS=windows GOARCH=amd64 go build -o build/printer-service-amd64.exe ./cmd/service/main.go
-
 build-mac:
 	GOOS=darwin GOARCH=arm64 go build -o build/printer-arm64 ./cmd/server/main.go
 
