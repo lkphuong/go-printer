@@ -4,7 +4,7 @@ const (
 	OK                         = "ok"
 	PrintTypeKitchen PrintType = "kitchen"
 	PrintTypeCashier PrintType = "cashier"
-	API_KEY                    = "apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+	API_KEY                    = ""
 )
 
 type PrintType string
