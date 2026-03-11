@@ -24,3 +24,7 @@
 2025/12/15 23:51:55 print.go:49: Retry 4 after error: connect_timeout, sleeping 30s
 2025/12/15 23:52:06 app.go:121: hour:  23
 2025/12/15 23:52:06 app.go:123: Not time for cleanup yet.
+2026/03/11 10:44:55 app.go:100: Folders and logger initialized.
+2026/03/11 10:44:55 app.go:163: Server starting on :9099
+2026/03/11 10:44:55 app.go:121: hour:  10
+2026/03/11 10:44:55 app.go:123: Not time for cleanup yet.
