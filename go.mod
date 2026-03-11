@@ -6,7 +6,7 @@ require github.com/gin-gonic/gin v1.11.0
 
 require gopkg.in/natefinch/lumberjack.v2 v2.2.1
 
-require github.com/kardianos/service v1.2.4 // indirect
+require github.com/kardianos/service v1.2.4
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect

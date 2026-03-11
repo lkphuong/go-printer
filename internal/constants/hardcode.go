@@ -4,6 +4,7 @@ const (
 	OK                         = "ok"
 	PrintTypeKitchen PrintType = "kitchen"
 	PrintTypeCashier PrintType = "cashier"
+	API_KEY                    = "apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
 )
 
 type PrintType string
@@ -20,4 +21,5 @@ const (
 	CUT_ERROR       = "cut_error"       // lỗi cắt giấy
 	UNKNOWN_ERROR   = "unknown_error"   // lỗi không xác định
 	QUEUE_FULL      = "queue_full"      // hàng đợi in đầy
+	API_KEY_FAIL    = "api_key_failed"  // thiếu API key
 )

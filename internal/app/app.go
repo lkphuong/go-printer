@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"go-printer/internal/handlers"
+	"go-printer/internal/middlewares"
 	"go-printer/internal/routers"
 	"go-printer/internal/services"
 	"log"
@@ -45,12 +46,13 @@ func (a *App) setupRouter() {
 	config := cors.Config{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:    []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:    []string{"Origin", "Content-Type", "Authorization", "X-API-Key"},
 	}
 
 	a.router.Use(cors.New(config))
 
 	v1 := a.router.Group("/api/v1")
+	v1.Use(middlewares.ValidateAPIKey())
 	{
 		routers.SetupPrintRoutes(v1, a.handlers.PrintHandler)
 	}

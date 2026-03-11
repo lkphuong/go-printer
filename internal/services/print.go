@@ -138,6 +138,7 @@ func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, 
 	}
 
 	// send file to telegram bot
+	utils.SendFileToTelegramBot(tempFilePath)
 
 	f, err := file.Open()
 	if err != nil {

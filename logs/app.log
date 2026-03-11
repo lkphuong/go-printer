@@ -28,3 +28,41 @@
 2026/03/11 10:44:55 app.go:163: Server starting on :9099
 2026/03/11 10:44:55 app.go:121: hour:  10
 2026/03/11 10:44:55 app.go:123: Not time for cleanup yet.
+2026/03/11 15:44:33 app.go:102: Folders and logger initialized.
+2026/03/11 15:44:33 app.go:165: Server starting on :9099
+2026/03/11 15:44:33 app.go:123: hour:  15
+2026/03/11 15:44:33 app.go:125: Not time for cleanup yet.
+2026/03/11 15:45:00 response.go:25: error message:  api_key_failed
+2026/03/11 15:45:18 response.go:25: error message:  api_key_failed
+2026/03/11 15:45:19 response.go:25: error message:  api_key_failed
+2026/03/11 15:45:21 response.go:25: error message:  api_key_failed
+2026/03/11 15:45:59 app.go:102: Folders and logger initialized.
+2026/03/11 15:45:59 app.go:165: Server starting on :9099
+2026/03/11 15:45:59 app.go:123: hour:  15
+2026/03/11 15:45:59 app.go:125: Not time for cleanup yet.
+2026/03/11 15:46:03 apikey.go:15: apiKey:  apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+2026/03/11 15:46:03 response.go:25: error message:  api_key_failed
+2026/03/11 15:46:05 apikey.go:15: apiKey:  apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+2026/03/11 15:46:05 response.go:25: error message:  api_key_failed
+2026/03/11 15:46:06 apikey.go:15: apiKey:  apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+2026/03/11 15:46:06 response.go:25: error message:  api_key_failed
+2026/03/11 15:46:06 apikey.go:15: apiKey:  apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+2026/03/11 15:46:06 response.go:25: error message:  api_key_failed
+2026/03/11 15:46:07 apikey.go:15: apiKey:  apikey_XGR7k5rXIQPu3KcFsdT9Eu8lpozVzVV2f57EOKkYZb3P27eA"
+2026/03/11 15:46:07 response.go:25: error message:  api_key_failed
+2026/03/11 15:47:14 app.go:102: Folders and logger initialized.
+2026/03/11 15:47:14 app.go:165: Server starting on :9099
+2026/03/11 15:47:14 app.go:123: hour:  15
+2026/03/11 15:47:14 app.go:125: Not time for cleanup yet.
+2026/03/11 15:47:34 response.go:25: error message:  api_key_failed
+2026/03/11 15:47:36 response.go:25: error message:  api_key_failed
+2026/03/11 15:48:00 app.go:102: Folders and logger initialized.
+2026/03/11 15:48:00 app.go:165: Server starting on :9099
+2026/03/11 15:48:00 app.go:123: hour:  15
+2026/03/11 15:48:00 app.go:125: Not time for cleanup yet.
+2026/03/11 15:48:05 response.go:25: error message:  api_key_failed
+2026/03/11 15:48:54 app.go:102: Folders and logger initialized.
+2026/03/11 15:48:54 app.go:165: Server starting on :9099
+2026/03/11 15:48:54 app.go:123: hour:  15
+2026/03/11 15:48:54 app.go:125: Not time for cleanup yet.
+2026/03/11 15:48:58 response.go:25: error message:  api_key_failed
