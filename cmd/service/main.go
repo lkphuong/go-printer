@@ -128,27 +128,27 @@ func main() {
 	}
 
 	// Check if running as Administrator
-	cmd := exec.Command("powershell", "-Command", `
-		if ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-			"true"
-		} else {
-			"false"
-		}
-	`)
-	output, err := cmd.Output()
-	isAdmin := err == nil && strings.TrimSpace(string(output)) == "true"
+	// cmd := exec.Command("powershell", "-Command", `
+	// 	if ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+	// 		"true"
+	// 	} else {
+	// 		"false"
+	// 	}
+	// `)
+	//output, err := cmd.Output()
+	//isAdmin := err == nil && strings.TrimSpace(string(output)) == "true"
 
-	if !isAdmin {
-		fmt.Println("Requires Administrator privileges")
-		fmt.Println("")
-		fmt.Println("Please run this program as Administrator:")
-		fmt.Println("  Right-click on printer-service.exe")
-		fmt.Println("  Select 'Run as administrator'")
-		fmt.Println("")
-		fmt.Print("Press Enter to exit...")
-		fmt.Scanln()
-		os.Exit(1)
-	}
+	// if !isAdmin {
+	// 	fmt.Println("Requires Administrator privileges")
+	// 	fmt.Println("")
+	// 	fmt.Println("Please run this program as Administrator:")
+	// 	fmt.Println("  Right-click on printer-service.exe")
+	// 	fmt.Println("  Select 'Run as administrator'")
+	// 	fmt.Println("")
+	// 	fmt.Print("Press Enter to exit...")
+	// 	fmt.Scanln()
+	// 	os.Exit(1)
+	// }
 
 	exePath, err := os.Executable()
 	if err != nil {
