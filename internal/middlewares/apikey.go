@@ -10,7 +10,7 @@ import (
 
 func ValidateAPIKey() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		apiKey := c.GetHeader("api-key")
+		apiKey := c.GetHeader("API-Key")
 		if apiKey == "" {
 			c.Abort()
 			utils.ResponseError(c, http.StatusUnauthorized, constants.API_KEY_FAIL, nil)
