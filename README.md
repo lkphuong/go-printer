@@ -73,36 +73,7 @@ Nếu chạy đúng, kết quả trả về danh sách tên máy in. Tên máy i
 
 ---
 
-## 4. Gửi lệnh in
-
-### 4.1. Gán loại cho máy in (tùy chọn)
-
-Gán loại `kitchen` (bếp) hoặc `cashier` (thu ngân):
-
-```bash
-curl -X POST http://localhost:9099/api/v1/printers/config ^
-  -H "API-Key: <API_KEY_CUA_BAN>" ^
-  -H "Content-Type: application/json" ^
-  -d "{\"printer_name\": \"MayInBep\", \"type\": [\"kitchen\"]}"
-```
-
-### 4.2. In thử
-
-Lệnh in gửi theo dạng **multipart/form-data**, gồm các trường: `file` (ảnh JPEG, bắt buộc), `printer` (đúng tên máy in, bắt buộc), `copies` (số bản, mặc định `1`).
-
-```bash
-curl -X POST http://localhost:9099/api/v1/printers/jobs ^
-  -H "API-Key: <API_KEY_CUA_BAN>" ^
-  -F "printer=MayInBep" ^
-  -F "copies=1" ^
-  -F "file=@C:\duong-dan\hoadon.jpg"
-```
-
-> **Quan trọng:** Chỉ in được **ảnh JPEG**. File PDF, Word, PNG sẽ không in được.
-
----
-
-## 5. Quản lý dịch vụ
+## 4. Quản lý dịch vụ
 
 Mở `services.msc`, tìm **"Printer AMD64 Service"**, bấm chuột phải để:
 
@@ -119,9 +90,9 @@ Mở `services.msc`, tìm **"Printer AMD64 Service"**, bấm chuột phải đ�
 
 ---
 
-## 6. Xử lý sự cố
+## 5. Xử lý sự cố
 
-### 6.1. Quy trình chẩn đoán (làm lần lượt từ trên xuống)
+### 5.1. Quy trình chẩn đoán (làm lần lượt từ trên xuống)
 
 Khi máy in không in được, kiểm tra **lần lượt từng bước**. Dừng lại ngay tại bước phát hiện ra vấn đề:
 
