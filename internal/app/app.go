@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"go-printer/internal/handlers"
+	"go-printer/internal/logger"
 	"go-printer/internal/middlewares"
 	"go-printer/internal/routers"
 	"go-printer/internal/services"
@@ -99,6 +100,11 @@ func initializing() {
 	})
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	// init MongoDB logger; on failure the service continues with file-only logging.
+	if err := logger.Init(); err != nil {
+		log.Println("MongoDB logger init failed, continuing with file logging only:", err)
+	}
+
 	log.Println("Folders and logger initialized.")
 }
 
@@ -159,6 +165,9 @@ func cleanupFolder() {
 		}
 	}
 	log.Println("Logs cleanup completed.")
+
+	// drop MongoDB log collections older than the retention window.
+	logger.CleanupOldCollections()
 }
 
 func (a *App) Run() {
@@ -172,7 +181,14 @@ func (a *App) Run() {
 		ticker := time.NewTicker(1 * time.Hour)
 		defer ticker.Stop()
 		for {
-			cleanupFolder()
+			func() {
+				defer func() {
+					if rec := recover(); rec != nil {
+						log.Printf("cleanup goroutine panic recovered: %v", rec)
+					}
+				}()
+				cleanupFolder()
+			}()
 			<-ticker.C
 		}
 	}()

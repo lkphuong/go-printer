@@ -3,6 +3,7 @@ package handlers
 import (
 	"go-printer/internal/constants"
 	"go-printer/internal/dto/request"
+	"go-printer/internal/logger"
 	"go-printer/internal/services"
 	"go-printer/internal/utils"
 	"log"
@@ -24,7 +25,7 @@ func NewPrintHandler(printService *services.PrintService) *PrintHandler {
 func (ph *PrintHandler) GetPrinters(c *gin.Context) {
 	printers, err := ph.printService.GetPrintersLocal()
 	if err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to get printers", err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, constants.GET_PRINTERS_FAILED, err.Error())
 		return
 
 	}
@@ -36,12 +37,13 @@ func (ph *PrintHandler) GetPrintConfig(c *gin.Context) {
 	printer := c.Param("printer")
 	config, err := ph.printService.GetPrintConfig(printer)
 	if err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to get print config", err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, constants.READ_CONFIG_FAILED, err.Error())
 		return
 	}
 
 	if config.PrinterName == "" && printer != "" {
-		utils.ResponseError(c, http.StatusBadRequest, "Printer config not found", nil)
+		logger.LogPrint(constants.CONFIG_NOT_FOUND, http.StatusBadRequest, "printer config not found: "+printer)
+		utils.ResponseError(c, http.StatusBadRequest, constants.CONFIG_NOT_FOUND, nil)
 		return
 	}
 
@@ -53,12 +55,13 @@ func (ph *PrintHandler) ConfigPrinter(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println("err", err)
 		msg := utils.CustomErrorMessage(err)
+		logger.LogPrint(constants.INVALID_REQUEST, http.StatusBadRequest, err.Error())
 		utils.ResponseError(c, http.StatusBadRequest, msg, err.Error())
 		return
 	}
 
 	if err := ph.printService.ConfigPrinter(request.PrinterName, request.Type); err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to config printer", err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, constants.WRITE_CONFIG_FAILED, err.Error())
 		return
 	}
 
@@ -68,7 +71,8 @@ func (ph *PrintHandler) ConfigPrinter(c *gin.Context) {
 func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to get form data", err.Error())
+		logger.LogPrint(constants.FORM_PARSE_FAILED, http.StatusBadRequest, err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, constants.FORM_PARSE_FAILED, err.Error())
 		return
 	}
 
@@ -81,7 +85,14 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 	}
 
 	if len(files) == 0 {
-		utils.ResponseError(c, http.StatusBadRequest, "no_files_uploaded", nil)
+		logger.LogPrint(constants.NO_FILES_UPLOADED, http.StatusBadRequest, "no files in form")
+		utils.ResponseError(c, http.StatusBadRequest, constants.NO_FILES_UPLOADED, nil)
+		return
+	}
+
+	if len(printer) == 0 {
+		logger.LogPrint(constants.NO_PRINTER, http.StatusBadRequest, "printer field missing")
+		utils.ResponseError(c, http.StatusBadRequest, constants.NO_PRINTER, nil)
 		return
 	}
 
@@ -95,7 +106,7 @@ func (ph *PrintHandler) JobPrint(c *gin.Context) {
 
 func (ph *PrintHandler) ClearCache(c *gin.Context) {
 	if err := ph.printService.ClearCache(); err != nil {
-		utils.ResponseError(c, http.StatusBadRequest, "Failed to clear cache", err.Error())
+		utils.ResponseError(c, http.StatusBadRequest, constants.CLEAR_CACHE_FAILED, err.Error())
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/kardianos/service"
 )
@@ -25,6 +26,22 @@ func (p *program) run() {
 	log.SetOutput(logFile)
 
 	log.Println("Service started")
+
+	// Supervisor loop: if NewApp() or Run() panics, recover, pause briefly, and
+	// respawn the app so the printer service stays available without OS-level restart.
+	for {
+		superviseApp()
+		log.Println("App exited, restarting in 2s...")
+		time.Sleep(2 * time.Second)
+	}
+}
+
+func superviseApp() {
+	defer func() {
+		if rec := recover(); rec != nil {
+			log.Printf("app panic recovered by supervisor: %v", rec)
+		}
+	}()
 
 	a := app.NewApp()
 	a.Run()
