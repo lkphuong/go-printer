@@ -13,14 +13,14 @@ build-linux:
 docker-build:
 	docker build -t go-printer .
 
-bundle-windows:
+bundle-p9099:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build \
 		-trimpath \
 		-ldflags="-s -w -buildid=" \
-		-o build/printer-windows-amd64.exe \
+		-o build/printer-p9099-amd64.exe \
 		./cmd/server/main.go
 
-	upx --best --lzma build/printer-windows-amd64.exe
+	upx --best --lzma build/printer-p9099-amd64.exe
 
 bundle-p9098:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build \
