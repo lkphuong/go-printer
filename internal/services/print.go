@@ -2,6 +2,8 @@ package services
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"go-printer/internal/constants"
@@ -20,6 +22,23 @@ import (
 )
 
 type PrintService struct{}
+
+func newTempUploadPath(now time.Time, filename string) (string, error) {
+	randomSuffix := make([]byte, 8)
+	if _, err := rand.Read(randomSuffix); err != nil {
+		return "", err
+	}
+
+	baseName := filepath.Base(filename)
+	if baseName == "." || baseName == string(filepath.Separator) {
+		baseName = "upload"
+	}
+
+	return filepath.Join(
+		"uploads",
+		now.Format("20060102150405")+"_"+hex.EncodeToString(randomSuffix)+"_"+baseName,
+	), nil
+}
 
 func (ps *PrintService) GetPrintersLocal() ([]string, error) {
 
@@ -142,8 +161,11 @@ func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, 
 	ip := strings.TrimSpace(out.String())
 
 	// save file tạm thời
-	now := time.Now()
-	tempFilePath := filepath.Join("uploads", now.Format("20060102150405")+"_"+file.Filename)
+	tempFilePath, err := newTempUploadPath(time.Now(), file.Filename)
+	if err != nil {
+		logger.LogPrint(constants.SAVE_FILE_FAILED, 400, err.Error())
+		return err
+	}
 	if err := c.SaveUploadedFile(file, tempFilePath); err != nil {
 		logger.LogPrint(constants.SAVE_FILE_FAILED, 400, err.Error())
 		return err
