@@ -2,11 +2,13 @@ package utils
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"go-printer/internal/constants"
 	"go-printer/internal/logger"
 	"image"
 	_ "image/jpeg"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -17,70 +19,120 @@ import (
 )
 
 type PrintRequest struct {
-	IP         string
-	FilePath   string
-	Copies     string
-	Result     chan error
-	StartTime  time.Time
-	RetryCount int
+	IP       string
+	FilePath string
+	Copies   string
 }
 
 var printQueue = make(chan PrintRequest, 1000)
 
+type printFunc func(ip string, filePath string, copies string) error
+
+type retryPolicy struct {
+	interval time.Duration
+	timeout  time.Duration
+	now      func() time.Time
+	sleep    func(time.Duration)
+}
+
+type retryablePrintError struct {
+	cause error
+}
+
+func (e *retryablePrintError) Error() string {
+	return e.cause.Error()
+}
+
+func (e *retryablePrintError) Unwrap() error {
+	return e.cause
+}
+
+func newRetryablePrintError(err error) error {
+	if err == nil {
+		return nil
+	}
+	return &retryablePrintError{cause: err}
+}
+
+func isRetryablePrintError(err error) bool {
+	var retryableErr *retryablePrintError
+	return errors.As(err, &retryableErr)
+}
+
+func defaultPrintRetryPolicy() retryPolicy {
+	return retryPolicy{
+		interval: 30 * time.Second,
+		timeout:  5 * time.Minute,
+		now:      time.Now,
+		sleep:    time.Sleep,
+	}
+}
+
 func startPrintWorker() {
 	log.Println("Starting print worker...")
-	go func() {
-		// If the dispatch loop panics, recover and respawn the worker so the
-		// queue keeps draining instead of stalling for the rest of the process life.
-		defer func() {
-			if rec := recover(); rec != nil {
-				log.Printf("print worker dispatch panic recovered, restarting worker: %v", rec)
-				logger.LogPrint(constants.UNKNOWN_ERROR, 500, fmt.Sprintf("print worker panic, restarting: %v", rec))
-				time.Sleep(1 * time.Second)
-				startPrintWorker()
-			}
+	go runPrintWorker(printQueue, func(req PrintRequest) {
+		_ = processPrintRequest(req, printFile, defaultPrintRetryPolicy())
+	})
+}
+
+func runPrintWorker(queue <-chan PrintRequest, process func(PrintRequest)) {
+	for req := range queue {
+		func() {
+			defer func() {
+				if rec := recover(); rec != nil {
+					log.Printf("print job panic recovered: %v", rec)
+					logger.LogPrint(constants.UNKNOWN_ERROR, 500, fmt.Sprintf("panic: %v", rec))
+				}
+			}()
+			process(req)
 		}()
-		for req := range printQueue {
-			go func(r PrintRequest) {
-				defer func() {
-					if rec := recover(); rec != nil {
-						log.Printf("print job panic recovered: %v", rec)
-						logger.LogPrint(constants.UNKNOWN_ERROR, 500, fmt.Sprintf("panic: %v", rec))
-					}
-				}()
-				var err error
-				for {
-					err = printFile(r.IP, r.FilePath, r.Copies)
-					if err == nil {
-						break
-					}
-					r.RetryCount++
-					if time.Since(r.StartTime) > 1*time.Hour {
-						log.Printf("Job expired after 1 hour, retries: %d", r.RetryCount)
-						logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("job expired after 1 hour, retries: %d", r.RetryCount))
-						// xoá file tạm thời
-						if err := os.Remove(r.FilePath); err != nil {
-							log.Println("Xoá file tạm thời fail: ", err)
-							logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("failed to remove temporary file: %v", err))
-						}
-						break
-					}
-					log.Printf("Retry %d after error: %v, sleeping 30s", r.RetryCount, err)
-					logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("retry %d after error: %v", r.RetryCount, err))
-					time.Sleep(30 * time.Second)
-				}
+	}
+}
 
-				// Job completed: write the final outcome to MongoDB.
-				if err == nil {
-					logger.LogPrint(constants.OK, 200, "")
-				} else {
-					logger.LogPrint(err.Error(), 500, err.Error())
-				}
+func processPrintRequest(req PrintRequest, print printFunc, policy retryPolicy) error {
+	startedAt := policy.now()
+	retryCount := 0
 
-				r.Result <- err
-			}(req)
+	for {
+		err := print(req.IP, req.FilePath, req.Copies)
+		if err == nil {
+			logger.LogPrint(constants.OK, 200, "")
+			return nil
 		}
-	}()
+
+		if !isRetryablePrintError(err) {
+			logger.LogPrint(err.Error(), 500, err.Error())
+			return err
+		}
+
+		retryCount++
+		if policy.now().Sub(startedAt) >= policy.timeout {
+			log.Printf("Job expired after %s, retries: %d", policy.timeout, retryCount)
+			logger.LogPrint(
+				constants.PRINT_FAILED,
+				500,
+				fmt.Sprintf("job expired after %s, retries: %d", policy.timeout, retryCount),
+			)
+			if removeErr := os.Remove(req.FilePath); removeErr != nil && !errors.Is(removeErr, os.ErrNotExist) {
+				log.Println("Xoá file tạm thời fail: ", removeErr)
+				logger.LogPrint(
+					constants.PRINT_FAILED,
+					500,
+					fmt.Sprintf("failed to remove temporary file: %v", removeErr),
+				)
+			}
+			logger.LogPrint(err.Error(), 500, err.Error())
+			return err
+		}
+
+		log.Printf("Retry %d after error: %v, sleeping %s", retryCount, err, policy.interval)
+		logger.LogPrint(
+			constants.PRINT_FAILED,
+			500,
+			fmt.Sprintf("retry %d after error: %v", retryCount, err),
+		)
+		policy.sleep(policy.interval)
+	}
 }
 
 func init() {
@@ -89,15 +141,16 @@ func init() {
 
 func PrintFileQueued(ip string, filePath string, copies string) error {
 	req := PrintRequest{
-		IP:         ip,
-		FilePath:   filePath,
-		Copies:     copies,
-		Result:     make(chan error, 1),
-		StartTime:  time.Now(),
-		RetryCount: 0,
+		IP:       ip,
+		FilePath: filePath,
+		Copies:   copies,
 	}
+	return enqueuePrintRequest(printQueue, req)
+}
+
+func enqueuePrintRequest(queue chan<- PrintRequest, req PrintRequest) error {
 	select {
-	case printQueue <- req:
+	case queue <- req:
 		return nil // Gửi thành công, không đợi
 	default:
 		return fmt.Errorf(constants.QUEUE_FULL) // Queue đầy, trả về lỗi
@@ -205,20 +258,37 @@ func printFile(ip string, filePath string, copies string) error {
 
 	// Gửi lệnh in nhiều bản
 	for i := 0; i < numCopies; i++ {
-		_, err = printerConn.Write(printCmd)
-		// Thêm vài dòng trắng dòng trắng sau khi in ảnh
-		printerConn.Write([]byte{0x0A, 0x0A, 0x0A, 0x0A})
-		// conn.Write([]byte{0x0A, 0x0A})
-		printerConn.Write([]byte{0x1D, 0x56, 0x00}) // Cắt giấy (GS V 0)
-
-		if err != nil {
-			log.Println("Gửi lệnh in fail: ", err)
-			logger.LogPrint(constants.PRINT_FAILED, 500, "send print command failed: "+err.Error())
+		if err := writePrintCopy(printerConn, printCmd); err != nil {
 			return err
 		}
 
 		// await 0.5 second between copies
 		time.Sleep(500 * time.Millisecond)
+	}
+
+	return nil
+}
+
+func writePrintCopy(printerConn net.Conn, printCmd []byte) error {
+	writes := []struct {
+		data  []byte
+		stage string
+	}{
+		{data: printCmd, stage: "send print command"},
+		{data: []byte{0x0A, 0x0A, 0x0A, 0x0A}, stage: "send paper feed"},
+		{data: []byte{0x1D, 0x56, 0x00}, stage: "send cut command"},
+	}
+
+	for _, write := range writes {
+		written, err := printerConn.Write(write.data)
+		if err == nil && written != len(write.data) {
+			err = io.ErrShortWrite
+		}
+		if err != nil {
+			log.Printf("%s failed: %v", write.stage, err)
+			logger.LogPrint(constants.PRINT_FAILED, 500, write.stage+" failed: "+err.Error())
+			return newRetryablePrintError(fmt.Errorf("%s failed: %w", write.stage, err))
+		}
 	}
 
 	return nil
@@ -286,16 +356,19 @@ func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
 }
 
 func ConnectPrinter(ip string) (net.Conn, error) {
-
-	address := fmt.Sprintf("%s:%d", ip, 9100)
+	address := printerAddress(ip)
 
 	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
 	if err != nil {
 		log.Println("lỗi kết nối máy in: ", err)
 		logger.LogPrint(constants.CONNECT_TIMEOUT, 500, "connect printer failed: "+err.Error())
-		return nil, fmt.Errorf(constants.CONNECT_TIMEOUT)
+		return nil, newRetryablePrintError(fmt.Errorf("%s: %w", constants.CONNECT_TIMEOUT, err))
 	}
 	return printerConn, nil
+}
+
+func printerAddress(ip string) string {
+	return net.JoinHostPort(ip, "9100")
 }
 
 func printStatus(printerConn net.Conn) error {
