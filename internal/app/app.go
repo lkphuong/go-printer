@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-printer/internal/handlers"
 	"go-printer/internal/logger"
 	"go-printer/internal/middlewares"
@@ -62,6 +63,7 @@ func (a *App) setupRouter() {
 func initializing() {
 	// init folder database, uploads, logs
 	log.Println("Initializing folders...")
+	logger.LogPrint("Initializing folders...", 200, "Initializing folders...")
 	uploadsDir := filepath.Join(".", "uploads")
 	os.MkdirAll(uploadsDir, 0755)
 
@@ -103,9 +105,11 @@ func initializing() {
 	// init MongoDB logger; on failure the service continues with file-only logging.
 	if err := logger.Init(); err != nil {
 		log.Println("MongoDB logger init failed, continuing with file logging only:", err)
+		logger.LogPrint("MongoDB logger init failed, continuing with file logging only:", 500, fmt.Sprintf("MongoDB logger init failed: %v", err))
 	}
 
 	log.Println("Folders and logger initialized.")
+	logger.LogPrint("Folders and logger initialized.", 200, "Folders and logger initialized.")
 }
 
 func NewApp() *App {
@@ -126,28 +130,28 @@ func NewApp() *App {
 func cleanupFolder() {
 	// cleanup at 5:00 AM
 	currentTime := time.Now()
-	log.Println("hour: ", currentTime.Hour())
+	logger.LogPrint(fmt.Sprintf("hour: %d", currentTime.Hour()), 200, fmt.Sprintf("hour: %d", currentTime.Hour()))
 	if currentTime.Hour() <= 4 || currentTime.Hour() > 6 {
-		log.Println("Not time for cleanup yet.")
+		logger.LogPrint("Not time for cleanup yet.", 200, "Not time for cleanup yet.")
 		return
 	}
-	log.Println("Running cleanup of uploads folder...")
+	logger.LogPrint("Running cleanup of uploads folder...", 200, "Running cleanup of uploads folder...")
 	uploadsDir := filepath.Join(".", "uploads")
 	files, err := os.ReadDir(uploadsDir)
 	if err != nil {
-		log.Println("Error reading uploads directory:", err)
+		logger.LogPrint(fmt.Sprintf("Error reading uploads directory: %v", err), 500, fmt.Sprintf("Error reading uploads directory: %v", err))
 	} else {
 		for _, file := range files {
 			_ = os.Remove(filepath.Join(uploadsDir, file.Name()))
 		}
-		log.Println("Uploads cleanup completed.")
+		logger.LogPrint("Uploads cleanup completed.", 200, "Uploads cleanup completed.")
 	}
 
 	// cleanup logs older than 14 days
 	logsDir := filepath.Join(".", "logs")
 	files, err = os.ReadDir(logsDir)
 	if err != nil {
-		log.Println("Error reading logs directory:", err)
+		logger.LogPrint(fmt.Sprintf("Error reading logs directory: %v", err), 500, fmt.Sprintf("Error reading logs directory: %v", err))
 		return
 	}
 	now := time.Now()
@@ -161,19 +165,19 @@ func cleanupFolder() {
 		}
 		if now.Sub(info.ModTime()) > 14*24*time.Hour {
 			os.Remove(filepath.Join(logsDir, file.Name()))
-			log.Printf("Deleted old log file: %s", file.Name())
+			logger.LogPrint(fmt.Sprintf("Deleted old log file: %s", file.Name()), 200, fmt.Sprintf("Deleted old log file: %s", file.Name()))
 		}
 	}
-	log.Println("Logs cleanup completed.")
+	logger.LogPrint("Logs cleanup completed.", 200, "Logs cleanup completed.")
 
 	// drop MongoDB log collections older than the retention window.
 	logger.CleanupOldCollections()
 }
 
 func (a *App) Run() {
-	log.Println("Server starting on :9099")
+	logger.LogPrint("Server starting on :9099", 200, "Server starting on :9099")
 	if a.router == nil {
-		log.Fatal("router is nil, check NewApp() initialization")
+		logger.LogPrint("router is nil, check NewApp() initialization", 500, "router is nil, check NewApp() initialization")
 	}
 
 	go func() {
@@ -184,7 +188,7 @@ func (a *App) Run() {
 			func() {
 				defer func() {
 					if rec := recover(); rec != nil {
-						log.Printf("cleanup goroutine panic recovered: %v", rec)
+						logger.LogPrint(fmt.Sprintf("cleanup goroutine panic recovered: %v", rec), 500, fmt.Sprintf("cleanup goroutine panic recovered: %v", rec))
 					}
 				}()
 				cleanupFolder()
@@ -193,6 +197,6 @@ func (a *App) Run() {
 		}
 	}()
 
-	a.router.Run(":9098")
+	a.router.Run(":9099")
 
 }

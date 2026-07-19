@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	databaseName        = "printer_logs"
-	collectionPrefix    = "logs_"
+	databaseName         = "printer_logs"
+	collectionPrefix     = "logs_"
 	collectionDateLayout = "20060102"
-	retentionDays       = 14
-	deviceConfigPath    = "./config/device.json"
-	defaultLocation     = "unknown"
+	retentionDays        = 14
+	deviceConfigPath     = "./config/device.json"
+	defaultLocation      = "unknown"
 )
 
 // client is held at package level so every log call reuses one connection pool.

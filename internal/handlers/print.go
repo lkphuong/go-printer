@@ -53,7 +53,7 @@ func (ph *PrintHandler) GetPrintConfig(c *gin.Context) {
 func (ph *PrintHandler) ConfigPrinter(c *gin.Context) {
 	var request request.PrintConfigRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		log.Println("err", err)
+		logger.LogPrint(constants.INVALID_REQUEST, http.StatusBadRequest, err.Error())
 		msg := utils.CustomErrorMessage(err)
 		logger.LogPrint(constants.INVALID_REQUEST, http.StatusBadRequest, err.Error())
 		utils.ResponseError(c, http.StatusBadRequest, msg, err.Error())
@@ -61,10 +61,12 @@ func (ph *PrintHandler) ConfigPrinter(c *gin.Context) {
 	}
 
 	if err := ph.printService.ConfigPrinter(request.PrinterName, request.Type); err != nil {
+		logger.LogPrint(constants.WRITE_CONFIG_FAILED, http.StatusBadRequest, err.Error())
 		utils.ResponseError(c, http.StatusBadRequest, constants.WRITE_CONFIG_FAILED, err.Error())
 		return
 	}
 
+	logger.LogPrint("Printer configured successfully.", 200, "Printer configured successfully.")
 	utils.ResponseSuccess(c, nil, constants.OK)
 }
 

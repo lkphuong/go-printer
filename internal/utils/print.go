@@ -57,13 +57,16 @@ func startPrintWorker() {
 					r.RetryCount++
 					if time.Since(r.StartTime) > 1*time.Hour {
 						log.Printf("Job expired after 1 hour, retries: %d", r.RetryCount)
+						logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("job expired after 1 hour, retries: %d", r.RetryCount))
 						// xoá file tạm thời
 						if err := os.Remove(r.FilePath); err != nil {
 							log.Println("Xoá file tạm thời fail: ", err)
+							logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("failed to remove temporary file: %v", err))
 						}
 						break
 					}
 					log.Printf("Retry %d after error: %v, sleeping 30s", r.RetryCount, err)
+					logger.LogPrint(constants.PRINT_FAILED, 500, fmt.Sprintf("retry %d after error: %v", r.RetryCount, err))
 					time.Sleep(30 * time.Second)
 				}
 
@@ -158,22 +161,15 @@ func printFile(ip string, filePath string, copies string) error {
 		}
 	}
 
-	// printer|192.168.1.100:9100
-	printerConn, err := ConnectPrinter(ip)
-	if err != nil {
-		return err
-	}
-	defer printerConn.Close()
-
 	const MaxPrinterDots = 576 // Số điểm tối đa của máy in (tùy thuộc vào máy in)
 
 	// Kiểm tra status máy in
-	err = printStatus(printerConn)
-	if err != nil {
-		log.Println("Lỗi trạng thái máy in: ", err)
-		logger.LogPrint(err.Error(), 500, "printer status check failed: "+err.Error())
-		return err
-	}
+	// err = printStatus(printerConn)
+	// if err != nil {
+	// 	log.Println("Lỗi trạng thái máy in: ", err)
+	// 	logger.LogPrint(err.Error(), 500, "printer status check failed: "+err.Error())
+	// 	return err
+	// }
 
 	// Mở file ảnh
 	imgFile, err := os.Open(filePath)
@@ -199,6 +195,13 @@ func printFile(ip string, filePath string, copies string) error {
 		logger.LogPrint(constants.PRINT_FAILED, 500, "build print command failed: "+err.Error())
 		return err
 	}
+
+	// printer|192.168.1.100:9100
+	printerConn, err := ConnectPrinter(ip)
+	if err != nil {
+		return err
+	}
+	defer printerConn.Close()
 
 	// Gửi lệnh in nhiều bản
 	for i := 0; i < numCopies; i++ {
@@ -302,17 +305,20 @@ func printStatus(printerConn net.Conn) error {
 	if err != nil {
 		log.Println("Gửi lệnh truy vấn trạng thái fail: ", err)
 		logger.LogPrint(constants.PRINT_FAILED, 500, "write status query failed: "+err.Error())
-		return err
+		return nil
+		// return err
 	}
 
 	// Đọc phản hồi trạng thái từ máy in
 	buffer := make([]byte, 1)
-	printerConn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	printerConn.SetReadDeadline(time.Now().Add(5 * time.Second))
 	n, err := printerConn.Read(buffer)
 	if err != nil || n != 1 {
-		log.Println("Đọc trạng thái máy in fail: ", err)
-		logger.LogPrint(constants.PRINT_FAILED, 500, "read printer status failed")
-		return err
+		// log.Println("Đọc trạng thái máy in fail: ", err)
+		fmt.Println("Đọc trạng thái máy in fail: ", err)
+		logger.LogPrint(constants.PRINT_FAILED, 500, "read printer status failed: "+err.Error()+fmt.Sprintf(", bytes read: %d", n))
+		return nil
+		// return err
 	}
 
 	status := buffer[0]
@@ -347,9 +353,10 @@ func printStatus(printerConn net.Conn) error {
 
 	if len(errors) > 0 {
 		joined := strings.Join(errors, ", ")
-		log.Println("Lỗi máy in: ", joined)
+		fmt.Println("Lỗi máy in: ", joined)
+		logger.LogPrint(joined, 500, "printer status error: "+joined)
 		// Return the first specific status code so the worker logs the real reason.
-		return fmt.Errorf(errors[0])
+		// return fmt.Errorf(errors[0])
 	}
 
 	return nil
