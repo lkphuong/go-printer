@@ -4,6 +4,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"syscall"
 	"time"
 	"unsafe"
@@ -38,7 +39,7 @@ type docInfo1W struct {
 // service coi như xong việc — lỗi từ đây trở đi (máy Windows/driver treo, offline,
 // hết giấy...) thuộc phạm vi trách nhiệm của Windows/driver, service chỉ là proxy
 // trung gian nhận lệnh in, không tự lặp lại (retry) ở tầng ứng dụng cho các lỗi này.
-func printViaSpooler(printerName string, printCmd []byte, numCopies int) error {
+func printViaSpooler(printerName string, printCmd []byte, numCopies int, sourceFilePath string) error {
 	namePtr, err := syscall.UTF16PtrFromString(printerName)
 	if err != nil {
 		return fmt.Errorf("tên máy in không hợp lệ %q: %w", printerName, err)
@@ -55,6 +56,10 @@ func printViaSpooler(printerName string, printCmd []byte, numCopies int) error {
 	payload = append(payload, printCmd...)
 	payload = append(payload, 0x0A, 0x0A, 0x0A, 0x0A) // feed giấy
 	payload = append(payload, 0x1D, 0x56, 0x00)       // cắt giấy
+
+	if err := dumpPrinterPayload(payload, sourceFilePath); err != nil {
+		log.Println("Lưu file dump byte gửi máy in thất bại:", err)
+	}
 
 	for i := 0; i < numCopies; i++ {
 		docName := fmt.Sprintf("go-printer copy %d/%d", i+1, numCopies)

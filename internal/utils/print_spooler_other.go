@@ -9,6 +9,6 @@ import "fmt"
 // (SpoolerAvailable() == false) trước khi tới đây.
 const spoolerAvailable = false
 
-func printViaSpooler(printerName string, printCmd []byte, numCopies int) error {
+func printViaSpooler(printerName string, printCmd []byte, numCopies int, sourceFilePath string) error {
 	return fmt.Errorf("in qua Windows Spooler không được hỗ trợ trên hệ điều hành này")
 }

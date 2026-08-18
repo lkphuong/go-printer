@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -250,7 +251,7 @@ func printFile(printer string, filePath string, copies string) error {
 	// Spooler/driver tự lo việc chờ máy in rảnh, tránh tình trạng gửi bitmap thô làm
 	// tràn buffer máy in (in nửa tờ, nửa trắng). Lỗi từ đây trở đi thuộc về
 	// máy Windows/driver, không được retry ở tầng ứng dụng (xem printViaSpooler).
-	if err := printViaSpooler(printer, printCmd, numCopies); err != nil {
+	if err := printViaSpooler(printer, printCmd, numCopies, filePath); err != nil {
 		log.Println("In qua Windows Spooler fail: ", err)
 		logger.LogPrint(constants.PRINT_FAILED, 500, "print via spooler failed: "+err.Error())
 		return err
@@ -323,4 +324,26 @@ func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
 // SpoolerAvailable báo cho tầng service biết build hiện tại có thể in qua Windows Spooler.
 func SpoolerAvailable() bool {
 	return spoolerAvailable
+}
+
+// dumpPrinterPayload lưu nguyên văn (không sửa 1 byte nào) dữ liệu vừa gửi cho máy in
+// qua WritePrinter — bao gồm cả feed giấy + lệnh cắt được nối thêm trong printViaSpooler.
+// Đây chính là nội dung mà Windows Spooler ghi vào file .SPL (datatype RAW), nên đối
+// chiếu 2 file này (fc /b hoặc hex diff) sẽ chứng minh được service có gửi đúng dữ liệu
+// hay không, tách bạch lỗi service khỏi lỗi máy in/driver.
+//
+// File dump được đặt tên trùng với file gốc trong uploads/ (chỉ đổi đuôi thành .bin)
+// để dễ đối soát 1-1 giữa ảnh gốc và dữ liệu thực tế đã gửi cho máy in — tempFilePath
+// đã có timestamp + random suffix riêng cho từng job (newTempUploadPath) nên không lo
+// trùng tên giữa các lần in.
+func dumpPrinterPayload(payload []byte, sourceFilePath string) error {
+	dumpDir := filepath.Join("uploads", "spool-dumps")
+	if err := os.MkdirAll(dumpDir, 0755); err != nil {
+		return err
+	}
+
+	base := filepath.Base(sourceFilePath)
+	dumpName := strings.TrimSuffix(base, filepath.Ext(base)) + ".bin"
+
+	return os.WriteFile(filepath.Join(dumpDir, dumpName), payload, 0644)
 }
