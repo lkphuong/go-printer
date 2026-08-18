@@ -1,6 +1,0 @@
-projectKey=printer
-serverUrl=https://sonarqube-uat.karaokeicool.com.vn:2053
-serverVersion=26.1.0.118079
-dashboardUrl=https://sonarqube-uat.karaokeicool.com.vn:2053/dashboard?id=printer
-ceTaskId=a9811917-7cbf-46b8-845a-0568f0d11bde
-ceTaskUrl=https://sonarqube-uat.karaokeicool.com.vn:2053/api/ce/task?id=a9811917-7cbf-46b8-845a-0568f0d11bde

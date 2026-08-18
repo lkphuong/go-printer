@@ -73,7 +73,7 @@ func initializing() {
 	logsDir := filepath.Join(".", "logs")
 	os.MkdirAll(logsDir, 0755)
 
-	// init config.json
+	//init config.json
 	configsFile := filepath.Join(configDir, "config.json")
 	if _, err := os.Stat(configsFile); os.IsNotExist(err) {
 		emptyConfigs := []interface{}{}

@@ -8,9 +8,7 @@ import (
 	"go-printer/internal/logger"
 	"image"
 	_ "image/jpeg"
-	"io"
 	"log"
-	"net"
 	"os"
 	"os/exec"
 	"runtime"
@@ -19,14 +17,14 @@ import (
 )
 
 type PrintRequest struct {
-	IP       string
+	Printer  string // tên máy in đã cài trên Windows, dùng để in qua Spooler/driver
 	FilePath string
 	Copies   string
 }
 
 var printQueue = make(chan PrintRequest, 1000)
 
-type printFunc func(ip string, filePath string, copies string) error
+type printFunc func(printer string, filePath string, copies string) error
 
 type retryPolicy struct {
 	interval time.Duration
@@ -94,7 +92,7 @@ func processPrintRequest(req PrintRequest, print printFunc, policy retryPolicy) 
 	retryCount := 0
 
 	for {
-		err := print(req.IP, req.FilePath, req.Copies)
+		err := print(req.Printer, req.FilePath, req.Copies)
 		if err == nil {
 			logger.LogPrint(constants.OK, 200, "")
 			return nil
@@ -139,9 +137,9 @@ func init() {
 	startPrintWorker()
 }
 
-func PrintFileQueued(ip string, filePath string, copies string) error {
+func PrintFileQueued(printer string, filePath string, copies string) error {
 	req := PrintRequest{
-		IP:       ip,
+		Printer:  printer,
 		FilePath: filePath,
 		Copies:   copies,
 	}
@@ -205,7 +203,7 @@ func GetPrinters() ([]string, error) {
 	}
 }
 
-func printFile(ip string, filePath string, copies string) error {
+func printFile(printer string, filePath string, copies string) error {
 
 	numCopies := 1
 	if copies != "" {
@@ -216,13 +214,12 @@ func printFile(ip string, filePath string, copies string) error {
 
 	const MaxPrinterDots = 576 // Số điểm tối đa của máy in (tùy thuộc vào máy in)
 
-	// Kiểm tra status máy in
-	// err = printStatus(printerConn)
-	// if err != nil {
-	// 	log.Println("Lỗi trạng thái máy in: ", err)
-	// 	logger.LogPrint(err.Error(), 500, "printer status check failed: "+err.Error())
-	// 	return err
-	// }
+	if printer == "" {
+		err := fmt.Errorf("thiếu tên máy in để gửi lệnh in qua Windows Spooler")
+		log.Println(err)
+		logger.LogPrint(constants.NO_PRINTER, 500, err.Error())
+		return err
+	}
 
 	// Mở file ảnh
 	imgFile, err := os.Open(filePath)
@@ -249,46 +246,14 @@ func printFile(ip string, filePath string, copies string) error {
 		return err
 	}
 
-	// printer|192.168.1.100:9100
-	printerConn, err := ConnectPrinter(ip)
-	if err != nil {
+	// In 100% qua Windows Spooler + driver máy in — không còn đường socket TCP thô.
+	// Spooler/driver tự lo việc chờ máy in rảnh, tránh tình trạng gửi bitmap thô làm
+	// tràn buffer máy in (in nửa tờ, nửa trắng). Lỗi từ đây trở đi thuộc về
+	// máy Windows/driver, không được retry ở tầng ứng dụng (xem printViaSpooler).
+	if err := printViaSpooler(printer, printCmd, numCopies); err != nil {
+		log.Println("In qua Windows Spooler fail: ", err)
+		logger.LogPrint(constants.PRINT_FAILED, 500, "print via spooler failed: "+err.Error())
 		return err
-	}
-	defer printerConn.Close()
-
-	// Gửi lệnh in nhiều bản
-	for i := 0; i < numCopies; i++ {
-		if err := writePrintCopy(printerConn, printCmd); err != nil {
-			return err
-		}
-
-		// await 0.5 second between copies
-		time.Sleep(500 * time.Millisecond)
-	}
-
-	return nil
-}
-
-func writePrintCopy(printerConn net.Conn, printCmd []byte) error {
-	writes := []struct {
-		data  []byte
-		stage string
-	}{
-		{data: printCmd, stage: "send print command"},
-		{data: []byte{0x0A, 0x0A, 0x0A, 0x0A}, stage: "send paper feed"},
-		{data: []byte{0x1D, 0x56, 0x00}, stage: "send cut command"},
-	}
-
-	for _, write := range writes {
-		written, err := printerConn.Write(write.data)
-		if err == nil && written != len(write.data) {
-			err = io.ErrShortWrite
-		}
-		if err != nil {
-			log.Printf("%s failed: %v", write.stage, err)
-			logger.LogPrint(constants.PRINT_FAILED, 500, write.stage+" failed: "+err.Error())
-			return newRetryablePrintError(fmt.Errorf("%s failed: %w", write.stage, err))
-		}
 	}
 
 	return nil
@@ -355,83 +320,7 @@ func printImageCommand(img image.Image, maxWidth int) ([]byte, error) {
 	return command, nil
 }
 
-func ConnectPrinter(ip string) (net.Conn, error) {
-	address := printerAddress(ip)
-
-	printerConn, err := net.DialTimeout("tcp", address, 5*time.Second)
-	if err != nil {
-		log.Println("lỗi kết nối máy in: ", err)
-		logger.LogPrint(constants.CONNECT_TIMEOUT, 500, "connect printer failed: "+err.Error())
-		return nil, newRetryablePrintError(fmt.Errorf("%s: %w", constants.CONNECT_TIMEOUT, err))
-	}
-	return printerConn, nil
-}
-
-func printerAddress(ip string) string {
-	return net.JoinHostPort(ip, "9100")
-}
-
-func printStatus(printerConn net.Conn) error {
-	// Gửi lệnh truy vấn trạng thái: GS r 1 (0x1D 0x72 0x01)
-	statusCmd := []byte{0x1D, 0x72, 0x01}
-	_, err := printerConn.Write(statusCmd)
-	if err != nil {
-		log.Println("Gửi lệnh truy vấn trạng thái fail: ", err)
-		logger.LogPrint(constants.PRINT_FAILED, 500, "write status query failed: "+err.Error())
-		return nil
-		// return err
-	}
-
-	// Đọc phản hồi trạng thái từ máy in
-	buffer := make([]byte, 1)
-	printerConn.SetReadDeadline(time.Now().Add(5 * time.Second))
-	n, err := printerConn.Read(buffer)
-	if err != nil || n != 1 {
-		// log.Println("Đọc trạng thái máy in fail: ", err)
-		fmt.Println("Đọc trạng thái máy in fail: ", err)
-		logger.LogPrint(constants.PRINT_FAILED, 500, "read printer status failed: "+err.Error()+fmt.Sprintf(", bytes read: %d", n))
-		return nil
-		// return err
-	}
-
-	status := buffer[0]
-	log.Printf("Trạng thái máy in: 0x%02X", status)
-
-	// Log các lỗi dựa trên bit
-	errors := []string{}
-	if status&0x01 != 0 {
-		errors = append(errors, constants.OFFLINE)
-	}
-	if status&0x02 != 0 {
-		errors = append(errors, constants.OPEN)
-	}
-	if status&0x04 != 0 {
-		errors = append(errors, constants.PAPER_JAM)
-	}
-	if status&0x08 != 0 {
-		errors = append(errors, constants.PAPER_OUT)
-	}
-	if status&0x10 != 0 {
-		errors = append(errors, constants.CONNECT_TIMEOUT)
-	}
-	if status&0x20 != 0 {
-		errors = append(errors, constants.PAPER_NEAR_OUT)
-	}
-	if status&0x40 != 0 {
-		errors = append(errors, constants.CUT_ERROR)
-	}
-	if status&0x80 != 0 {
-		errors = append(errors, constants.UNKNOWN_ERROR)
-	}
-
-	if len(errors) > 0 {
-		joined := strings.Join(errors, ", ")
-		fmt.Println("Lỗi máy in: ", joined)
-		logger.LogPrint(joined, 500, "printer status error: "+joined)
-		// Return the first specific status code so the worker logs the real reason.
-		// return fmt.Errorf(errors[0])
-	}
-
-	return nil
-
+// SpoolerAvailable báo cho tầng service biết build hiện tại có thể in qua Windows Spooler.
+func SpoolerAvailable() bool {
+	return spoolerAvailable
 }

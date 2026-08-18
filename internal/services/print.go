@@ -1,7 +1,6 @@
 package services
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -13,9 +12,7 @@ import (
 	"log"
 	"mime/multipart"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -142,23 +139,12 @@ func (ps *PrintService) ConfigPrinter(printerName string, types []string) error 
 }
 
 func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, file *multipart.FileHeader) error {
-	// lấy những printer theo type
-	cmd := exec.Command(
-		"powershell",
-		fmt.Sprintf(
-			`(Get-PrinterPort -Name (Get-Printer -Name "%s").PortName).PrinterHostAddress`,
-			printer,
-		),
-	)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		logger.LogPrint(constants.PRINT_NOT_FOUND, 400, err.Error())
+	// In 100% qua Windows Spooler + driver máy in theo tên (WinAPI OpenPrinter tự xác
+	// định máy in), không còn cần dò IP qua PowerShell/socket TCP như trước.
+	if !utils.SpoolerAvailable() {
+		logger.LogPrint(constants.PRINT_NOT_FOUND, 400, "spooler unavailable on this platform")
 		return fmt.Errorf(constants.PRINT_NOT_FOUND)
 	}
-
-	ip := strings.TrimSpace(out.String())
 
 	// save file tạm thời
 	tempFilePath, err := newTempUploadPath(time.Now(), file.Filename)
@@ -181,7 +167,7 @@ func (ps *PrintService) JobPrint(c *gin.Context, printer string, copies string, 
 
 	// ping printer
 	// gửi in cho từng printer
-	if err := utils.PrintFileQueued(ip, tempFilePath, copies); err != nil {
+	if err := utils.PrintFileQueued(printer, tempFilePath, copies); err != nil {
 		log.Println("print file error: ", err)
 		logger.LogPrint(constants.QUEUE_FULL, 400, err.Error())
 		return err

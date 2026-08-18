@@ -20,8 +20,6 @@ bundle-p9099:
 		-o build/printer-p9099-amd64.exe \
 		./cmd/server/main.go
 
-	upx --best --lzma build/printer-p9099-amd64.exe
-
 bundle-p9098:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build \
 		-trimpath \
@@ -29,7 +27,6 @@ bundle-p9098:
 		-o build/printer-p9098-amd64.exe \
 		./cmd/server/main.go
 
-	upx --best --lzma build/printer-p9098-amd64.exe
 # Windows Service Setup
 # 1. Build: make build-windows-service
 # 2. Run: Double-click build/printer-service.exe (as Administrator)
