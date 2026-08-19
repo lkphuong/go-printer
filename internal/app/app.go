@@ -142,7 +142,7 @@ func cleanupFolder() {
 		logger.LogPrint(fmt.Sprintf("Error reading uploads directory: %v", err), 500, fmt.Sprintf("Error reading uploads directory: %v", err))
 	} else {
 		for _, file := range files {
-			_ = os.Remove(filepath.Join(uploadsDir, file.Name()))
+			_ = os.RemoveAll(filepath.Join(uploadsDir, file.Name()))
 		}
 		logger.LogPrint("Uploads cleanup completed.", 200, "Uploads cleanup completed.")
 	}
